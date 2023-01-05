@@ -1,0 +1,7 @@
+--- ComboKeyOption
+{\"CallWithMouse\":\"default\",\"SpecialHero\":\"Tinker\",\"LockMouseUntilPressThis\":0}
+
+{\"LockMouseUntilPressThis\":33}
+
+--- Option
+{"PointQ":"800, 950","SizeQ":"15, 15","SaveImg":false,"BlinkMin":200,"BlinkDelay":0}
