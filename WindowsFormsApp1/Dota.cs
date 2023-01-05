@@ -77,8 +77,9 @@ namespace WindowsFormsApp1
             }
             LoadListKeys();
             options = JsonConvert.DeserializeObject<ComboOption>(File.ReadAllText(pathOption));
-            //options = new ComboOption();
-            //File.WriteAllText(pathOption, JsonConvert.SerializeObject(options));
+
+            //ComboKeyOption testOptions = new ComboKeyOption();
+            //File.WriteAllText(pathOption, JsonConvert.SerializeObject(testOptions));
 
         }
         private void LoadListKeys()
@@ -87,302 +88,121 @@ namespace WindowsFormsApp1
             l_keymulti = new List<ComboKey>();
             if (chbCombo1.Checked)
             {
-                string[] key1 = user.Key1.Split('_');
+                ComboKey cbkey = new ComboKey(tbKey1.Text.ToLower(), tbCombo1.Text, tbCombo1.Tag);
                 if (tbKey1.Text.Length > 1)
                 {
-                    ComboKey cbkey = new ComboKey(tbKey1.Text.ToLower(), tbCombo1.Text);
-
-                    if (key1.Length > 3)
-                    {
-                        cbkey.CallWithMouse = key1[3];
-                    }
-                    if (key1.Length > 4)
-                    {
-                        cbkey.QMustBeCall = true;
-                    }
                     l_keymulti.Add(cbkey);
                 }
                 else
                 {
-                    ComboKey cbkey = new ComboKey(GetKeySelect(tbKey1.Text.ToLower()[0]), tbCombo1.Text);
-                    if (key1.Length > 3)
-                    {
-                        cbkey.CallWithMouse = key1[3];
-                    }
-                    if (key1.Length > 4)
-                    {
-                        cbkey.QMustBeCall = true;
-                    }
                     l_keys.Add(cbkey);
                 }
             }
             if (chbCombo2.Checked)
             {
-                string[] key2 = user.Key2.Split('_');
+                ComboKey cbkey = new ComboKey(tbKey2.Text.ToLower(), tbCombo2.Text, tbCombo2.Tag);
                 if (tbKey2.Text.Length > 1)
                 {
-                    ComboKey cbkey = new ComboKey(tbKey2.Text.ToLower(), tbCombo2.Text);
-                    if (key2.Length > 3)
-                    {
-                        cbkey.CallWithMouse = key2[3];
-                    }
-                    if (key2.Length > 4)
-                    {
-                        cbkey.QMustBeCall = true;
-                    }
                     l_keymulti.Add(cbkey);
                 }
                 else
                 {
-                    ComboKey cbkey = new ComboKey(GetKeySelect(tbKey2.Text.ToLower()[0]), tbCombo2.Text);
-                    if (key2.Length > 3)
-                    {
-                        cbkey.CallWithMouse = key2[3];
-                    }
-                    if (key2.Length > 4)
-                    {
-                        cbkey.QMustBeCall = true;
-                    }
                     l_keys.Add(cbkey);
                 }
             }
             if (chbCombo3.Checked)
             {
-                string[] key3 = user.Key3.Split('_');
+                ComboKey cbkey = new ComboKey(tbKey3.Text.ToLower(), tbCombo3.Text, tbCombo3.Tag);
                 if (tbKey3.Text.Length > 1)
                 {
-                    ComboKey cbkey = new ComboKey(tbKey3.Text.ToLower(), tbCombo3.Text);
-                    if (key3.Length > 3)
-                    {
-                        cbkey.CallWithMouse = key3[3];
-                    }
-                    if (key3.Length > 4)
-                    {
-                        cbkey.QMustBeCall = true;
-                    }
                     l_keymulti.Add(cbkey);
                 }
                 else
                 {
-                    ComboKey cbkey = new ComboKey(GetKeySelect(tbKey3.Text.ToLower()[0]), tbCombo3.Text);
-                    if (key3.Length > 3)
-                    {
-                        cbkey.CallWithMouse = key3[3];
-                    }
-                    if (key3.Length > 4)
-                    {
-                        cbkey.QMustBeCall = true;
-                    }
                     l_keys.Add(cbkey);
                 }
             }
             if (chbCombo4.Checked)
             {
-                string[] key4 = user.Key4.Split('_');
+                ComboKey cbkey = new ComboKey(tbKey4.Text.ToLower(), tbCombo4.Text, tbCombo4.Tag);
                 if (tbKey4.Text.Length > 1)
                 {
-                    ComboKey cbkey = new ComboKey(tbKey4.Text.ToLower(), tbCombo4.Text);
-                    if (key4.Length > 3)
-                    {
-                        cbkey.CallWithMouse = key4[3];
-                    }
-                    if (key4.Length > 4)
-                    {
-                        cbkey.QMustBeCall = true;
-                    }
                     l_keymulti.Add(cbkey);
                 }
                 else
                 {
-                    ComboKey cbkey = new ComboKey(GetKeySelect(tbKey4.Text.ToLower()[0]), tbCombo4.Text);
-                    if (key4.Length > 3)
-                    {
-                        cbkey.CallWithMouse = key4[3];
-                    }
-                    if (key4.Length > 4)
-                    {
-                        cbkey.QMustBeCall = true;
-                    }
                     l_keys.Add(cbkey);
                 }
             }
             if (chbCombo5.Checked)
             {
-                string[] key5 = user.Key5.Split('_');
+                ComboKey cbkey = new ComboKey(tbKey5.Text.ToLower(), tbCombo5.Text, tbCombo5.Tag);
                 if (tbKey5.Text.Length > 1)
                 {
-                    ComboKey cbkey = new ComboKey(tbKey5.Text.ToLower(), tbCombo5.Text);
-                    if (key5.Length > 3)
-                    {
-                        cbkey.CallWithMouse = key5[3];
-                    }
-                    if (key5.Length > 4)
-                    {
-                        cbkey.QMustBeCall = true;
-                    }
                     l_keymulti.Add(cbkey);
                 }
                 else
                 {
-                    ComboKey cbkey = new ComboKey(GetKeySelect(tbKey5.Text.ToLower()[0]), tbCombo5.Text);
-                    if (key5.Length > 3)
-                    {
-                        cbkey.CallWithMouse = key5[3];
-                    }
-                    if (key5.Length > 4)
-                    {
-                        cbkey.QMustBeCall = true;
-                    }
                     l_keys.Add(cbkey);
                 }
             }
             if (chbCombo6.Checked)
             {
-                string[] key6 = user.Key6.Split('_');
+                ComboKey cbkey = new ComboKey(tbKey6.Text.ToLower(), tbCombo6.Text, tbCombo6.Tag);
                 if (tbKey6.Text.Length > 1)
                 {
-                    ComboKey cbkey = new ComboKey(tbKey6.Text.ToLower(), tbCombo6.Text);
-                    if (key6.Length > 3)
-                    {
-                        cbkey.CallWithMouse = key6[3];
-                    }
-                    if (key6.Length > 4)
-                    {
-                        cbkey.QMustBeCall = true;
-                    }
                     l_keymulti.Add(cbkey);
                 }
                 else
                 {
-                    ComboKey cbkey = new ComboKey(GetKeySelect(tbKey6.Text.ToLower()[0]), tbCombo6.Text);
-                    if (key6.Length > 3)
-                    {
-                        cbkey.CallWithMouse = key6[3];
-                    }
-                    if (key6.Length > 4)
-                    {
-                        cbkey.QMustBeCall = true;
-                    }
                     l_keys.Add(cbkey);
                 }
             }
             if (chbCombo7.Checked)
             {
-                string[] key7 = user.Key7.Split('_');
+                ComboKey cbkey = new ComboKey(tbKey7.Text.ToLower(), tbCombo7.Text, tbCombo7.Tag);
                 if (tbKey7.Text.Length > 1)
                 {
-                    ComboKey cbkey = new ComboKey(tbKey7.Text.ToLower(), tbCombo7.Text);
-                    if (key7.Length > 3)
-                    {
-                        cbkey.CallWithMouse = key7[3];
-                    }
-                    if (key7.Length > 4)
-                    {
-                        cbkey.QMustBeCall = true;
-                    }
                     l_keymulti.Add(cbkey);
                 }
                 else
                 {
-                    ComboKey cbkey = new ComboKey(GetKeySelect(tbKey7.Text.ToLower()[0]), tbCombo7.Text);
-                    if (key7.Length > 3)
-                    {
-                        cbkey.CallWithMouse = key7[3];
-                    }
-                    if (key7.Length > 4)
-                    {
-                        cbkey.QMustBeCall = true;
-                    }
                     l_keys.Add(cbkey);
                 }
             }
             if (chbCombo8.Checked)
             {
-                string[] key8 = user.Key8.Split('_');
+                ComboKey cbkey = new ComboKey(tbKey8.Text.ToLower(), tbCombo8.Text, tbCombo8.Tag);
                 if (tbKey8.Text.Length > 1)
                 {
-                    ComboKey cbkey = new ComboKey(tbKey8.Text.ToLower(), tbCombo8.Text);
-                    if (key8.Length > 3)
-                    {
-                        cbkey.CallWithMouse = key8[3];
-                    }
-                    if (key8.Length > 4)
-                    {
-                        cbkey.QMustBeCall = true;
-                    }
                     l_keymulti.Add(cbkey);
                 }
                 else
                 {
-                    ComboKey cbkey = new ComboKey(GetKeySelect(tbKey8.Text.ToLower()[0]), tbCombo8.Text);
-                    if (key8.Length > 3)
-                    {
-                        cbkey.CallWithMouse = key8[3];
-                    }
-                    if (key8.Length > 4)
-                    {
-                        cbkey.QMustBeCall = true;
-                    }
                     l_keys.Add(cbkey);
                 }
             }
             if (chbCombo9.Checked)
             {
-                string[] key9 = user.Key9.Split('_');
+                ComboKey cbkey = new ComboKey(tbKey9.Text.ToLower(), tbCombo9.Text, tbCombo9.Tag);
                 if (tbKey9.Text.Length > 1)
                 {
-                    ComboKey cbkey = new ComboKey(tbKey9.Text.ToLower(), tbCombo9.Text);
-                    if (key9.Length > 3)
-                    {
-                        cbkey.CallWithMouse = key9[3];
-                    }
-                    if (key9.Length > 4)
-                    {
-                        cbkey.QMustBeCall = true;
-                    }
                     l_keymulti.Add(cbkey);
                 }
                 else
                 {
-                    ComboKey cbkey = new ComboKey(GetKeySelect(tbKey9.Text.ToLower()[0]), tbCombo9.Text);
-                    if (key9.Length > 3)
-                    {
-                        cbkey.CallWithMouse = key9[3];
-                    }
-                    if (key9.Length > 4)
-                    {
-                        cbkey.QMustBeCall = true;
-                    }
                     l_keys.Add(cbkey);
                 }
             }
             if (chbCombo10.Checked)
             {
-                string[] key10 = user.Key10.Split('_');
+                ComboKey cbkey = new ComboKey(tbKey10.Text.ToLower(), tbCombo10.Text, tbCombo10.Tag);
                 if (tbKey10.Text.Length > 1)
                 {
-                    ComboKey cbkey = new ComboKey(tbKey10.Text.ToLower(), tbCombo10.Text);
-                    if (key10.Length > 3)
-                    {
-                        cbkey.CallWithMouse = key10[3];
-                    }
-                    if (key10.Length > 4)
-                    {
-                        cbkey.QMustBeCall = true;
-                    }
                     l_keymulti.Add(cbkey);
                 }
                 else
                 {
-                    ComboKey cbkey = new ComboKey(GetKeySelect(tbKey10.Text.ToLower()[0]), tbCombo10.Text);
-                    if (key10.Length > 3)
-                    {
-                        cbkey.CallWithMouse = key10[3];
-                    }
-                    if (key10.Length > 4)
-                    {
-                        cbkey.QMustBeCall = true;
-                    }
                     l_keys.Add(cbkey);
                 }
             }
@@ -412,51 +232,112 @@ namespace WindowsFormsApp1
             tbKey1.Text = key1[0];
             tbCombo1.Text = key1[2];
             chbCombo1.Checked = key1[1] == "True";
+            tbCombo1.Tag = null;
+            if (key1.Length == 4)
+            {
+                ComboKeyOption option = JsonConvert.DeserializeObject<ComboKeyOption>(key1[3]);
+                tbCombo1.Tag = option;
+            }
 
             string[] key2 = user.Key2.Split('_');
             tbKey2.Text = key2[0];
             tbCombo2.Text = key2[2];
             chbCombo2.Checked = key2[1] == "True";
+            tbCombo2.Tag = null;
+            if (key2.Length == 4)
+            {
+                ComboKeyOption option = JsonConvert.DeserializeObject<ComboKeyOption>(key2[3]);
+                tbCombo2.Tag = option;
+            }
 
             string[] key3 = user.Key3.Split('_');
             tbKey3.Text = key3[0];
             tbCombo3.Text = key3[2];
             chbCombo3.Checked = key3[1] == "True";
+            tbCombo3.Tag = null;
+            if (key3.Length == 4)
+            {
+                ComboKeyOption option = JsonConvert.DeserializeObject<ComboKeyOption>(key3[3]);
+                tbCombo3.Tag = option;
+            }
 
             string[] key4 = user.Key4.Split('_');
             tbKey4.Text = key4[0];
             tbCombo4.Text = key4[2];
             chbCombo4.Checked = key4[1] == "True";
+            tbCombo4.Tag = null;
+            if (key4.Length == 4)
+            {
+                ComboKeyOption option = JsonConvert.DeserializeObject<ComboKeyOption>(key4[3]);
+                tbCombo4.Tag = option;
+            }
 
             string[] key5 = user.Key5.Split('_');
             tbKey5.Text = key5[0];
             tbCombo5.Text = key5[2];
             chbCombo5.Checked = key5[1] == "True";
+            tbCombo5.Tag = null;
+            if (key5.Length == 4)
+            {
+                ComboKeyOption option = JsonConvert.DeserializeObject<ComboKeyOption>(key5[3]);
+                tbCombo5.Tag = option;
+            }
 
             string[] key6 = user.Key6.Split('_');
             tbKey6.Text = key6[0];
             tbCombo6.Text = key6[2];
             chbCombo6.Checked = key6[1] == "True";
+            tbCombo6.Tag = null;
+            if (key6.Length == 4)
+            {
+                ComboKeyOption option = JsonConvert.DeserializeObject<ComboKeyOption>(key6[3]);
+                tbCombo6.Tag = option;
+            }
 
             string[] key7 = user.Key7.Split('_');
             tbKey7.Text = key7[0];
             tbCombo7.Text = key7[2];
             chbCombo7.Checked = key7[1] == "True";
+            tbCombo7.Tag = null;
+            if (key7.Length == 4)
+            {
+                ComboKeyOption option = JsonConvert.DeserializeObject<ComboKeyOption>(key7[3]);
+                tbCombo7.Tag = option;
+            }
 
             string[] key8 = user.Key8.Split('_');
             tbKey8.Text = key8[0];
             tbCombo8.Text = key8[2];
             chbCombo8.Checked = key8[1] == "True";
+            tbCombo8.Tag = null;
+            if (key8.Length == 4)
+            {
+                ComboKeyOption option = JsonConvert.DeserializeObject<ComboKeyOption>(key8[3]);
+                tbCombo8.Tag = option;
+            }
 
             string[] key9 = user.Key9.Split('_');
             tbKey9.Text = key9[0];
             tbCombo9.Text = key9[2];
             chbCombo9.Checked = key9[1] == "True";
+            tbCombo9.Tag = null;
+            if (key9.Length == 4)
+            {
+                ComboKeyOption option = JsonConvert.DeserializeObject<ComboKeyOption>(key9[3]);
+                tbCombo9.Tag = option;
+            }
 
             string[] key10 = user.Key10.Split('_');
             tbKey10.Text = key10[0];
             tbCombo10.Text = key10[2];
             chbCombo10.Checked = key10[1] == "True";
+            tbCombo10.Tag = null;
+            if (key10.Length == 4)
+            {
+                ComboKeyOption option = JsonConvert.DeserializeObject<ComboKeyOption>(key10[3]);
+                tbCombo10.Tag = option;
+            }
+
             runHandler = false;
         }
         private void SaveSetting(ComboSettings user)
@@ -632,7 +513,7 @@ namespace WindowsFormsApp1
         }
         public bool IsCorrectCursor(ComboKey combo)
         {
-            switch (combo.CallWithMouse)
+            switch (combo.Option.CallWithMouse)
             {
                 case "enemy":
                     return CompareBitmapsFast(enemy, GetCursorBitmap());
@@ -650,12 +531,13 @@ namespace WindowsFormsApp1
             Point current = GetCursorPoint();
             RECT current_rect;
             GetClipCursor(out current_rect);
-            if (combo.QMustBeCall)
+            if (combo.Option.LockMouseUntilPressThis != KeyDirectX.Nothing || combo.Option.SpecialHero == "Tinker")
             {
                 int offset = 5;
                 RECT rect = new RECT(current.X - offset, current.Y - offset, current.X + offset, current.Y + offset);
                 ClipCursor(ref rect);
             }
+            bool exitLoop = false;
             foreach (KeyDirectX item in combo.Combo)
             {
                 Thread.Sleep(inner_interval);
@@ -665,63 +547,82 @@ namespace WindowsFormsApp1
                 }
                 else
                 {
-                    //if (combo.QMustBeCall && !IsCorrectCursor(combo))
-                    //{
-                    //    ClipCursor(ref current_rect);
-                    //    break;
-                    //}
-                    if (combo.QMustBeCall && item == KeyDirectX.Q)
+                    switch (combo.Option.SpecialHero)
                     {
-                        //Chup anh nut Q
-                        Bitmap bmp1 = CaptureHelper.CaptureImage(options.SizeQ, options.PointQ);
-                        // Bitmap bmp1 = new Bitmap(System.IO.Directory.GetCurrentDirectory() + @"\Img\Q_test1_1.PNG");
-                        if (options.SaveImg)
-                        {
-                            bmp1.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\Q_test1.PNG");
-                        }
-                        //Bam Q
-                        if (!IsCorrectCursor(combo))
-                        {
-                            ClipCursor(ref current_rect);
+                        case "Tinker":
+                            if (item == KeyDirectX.Q)
+                            {
+                                //Chup anh nut Q
+                                Bitmap bmp1 = CaptureHelper.CaptureImage(options.SizeQ, options.PointQ);
+                                // Bitmap bmp1 = new Bitmap(System.IO.Directory.GetCurrentDirectory() + @"\Img\Q_test1_1.PNG");
+                                if (options.SaveImg)
+                                {
+                                    bmp1.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\Q_test1.PNG");
+                                }
+                                //Bam Q
+                                if (!IsCorrectCursor(combo))
+                                {
+                                    ClipCursor(ref current_rect);
+                                    exitLoop = true;
+                                    break;
+                                }
+                                HuyKeyPress(item);
+                                //Check anh nut Q
+                                Thread.Sleep(inner_interval);
+                                ClipCursor(ref current_rect);
+                                int lanthu = 0;
+                                chaylai:
+                                lanthu++;
+                                if (lanthu > 4)
+                                {
+                                    HuyKeyPress(KeyDirectX.S);
+                                    exitLoop = true;
+                                    break;
+                                }
+                                Thread.Sleep(100);
+                                Bitmap bmp2 = CaptureHelper.CaptureImage(options.SizeQ, options.PointQ);
+                                if (options.SaveImg)
+                                {
+                                    bmp2.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\Q_test2.PNG");
+                                }
+                                if (CompareBitmapsFast(bmp1, bmp2)) { goto chaylai; }
+                                Thread.Sleep(400);
+                                Bitmap bmp3 = CaptureHelper.CaptureImage(options.SizeQ, options.PointQ);
+                                if (options.SaveImg)
+                                {
+                                    bmp3.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\Q_test3.PNG");
+                                }
+                                if (CompareBitmapsFast(bmp1, bmp3)) { HuyKeyPress(KeyDirectX.S); exitLoop = true; break; }
+                            }
+                            else if (item == KeyDirectX.D2)
+                            {
+                                double khoangcach = Math.Sqrt(Math.Pow(GetCursorPoint().X - current.X, 2) + Math.Pow(GetCursorPoint().Y - current.Y, 2));
+                                if (khoangcach > options.BlinkMin)
+                                {
+                                    if (options.BlinkDelay > 0)
+                                    {
+                                        Thread.Sleep(options.BlinkDelay);
+                                    }
+                                    HuyKeyPress(item);
+                                }
+                            }
+                            else
+                            {
+                                HuyKeyPress(item);
+                            }
                             break;
-                        }
-                        HuyKeyPress(item);
-                        //Check anh nut Q
-                        Thread.Sleep(inner_interval);
-                        ClipCursor(ref current_rect);
-                        int lanthu = 0;
-                        chaylai:
-                        lanthu++;
-                        if (lanthu>4)
-                        {
+                        default:
+                            if (item == combo.Option.LockMouseUntilPressThis)
+                            {
+                                ClipCursor(ref current_rect);
+                            }
+                            HuyKeyPress(item);
                             break;
-                        }
-                        Thread.Sleep(100);
-                        Bitmap bmp2 = CaptureHelper.CaptureImage(options.SizeQ, options.PointQ);
-                        if (options.SaveImg)
-                        {
-                            bmp2.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\Q_test2.PNG");
-                        }
-                        if (CompareBitmapsFast(bmp1, bmp2)) { goto chaylai; }
-                        Thread.Sleep(400);
-                        Bitmap bmp3 = CaptureHelper.CaptureImage(options.SizeQ, options.PointQ);
-                        if (options.SaveImg)
-                        {
-                            bmp3.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\Q_test3.PNG");
-                        }
-                        if (CompareBitmapsFast(bmp1, bmp3)) { break; }
-                    }
-                    else
-                    {
-                        //if (item == KeyDirectX.Q)
-                        //{
-                        //    ClipCursor(ref current_rect);
-                        //}
-                        HuyKeyPress(item);
                     }
                 }
+                if (exitLoop) break;
             }
-
+            ClipCursor(ref current_rect);
         }
         public void Combo(string tbCombo)
         {
@@ -730,90 +631,6 @@ namespace WindowsFormsApp1
                 Thread.Sleep(interval);
                 HuyKeyPress(ComboSettings.GetKeyDirectXSelect(item));
             }
-        }
-        private Keys GetKeySelect(char item)
-        {
-            switch (item)
-            {
-                case '0':
-                    return Keys.D0;
-                case '1':
-                    return Keys.D1;
-                case '2':
-                    return Keys.D2;
-                case '3':
-                    return Keys.D3;
-                case '4':
-                    return Keys.D4;
-                case '5':
-                    return Keys.D5;
-                case '6':
-                    return Keys.D6;
-                case '7':
-                    return Keys.D7;
-                case '8':
-                    return Keys.D8;
-                case '9':
-                    return Keys.D9;
-                case 'q':
-                    return Keys.Q;
-                case 'w':
-                    return Keys.W;
-                case 'e':
-                    return Keys.E;
-                case 'r':
-                    return Keys.R;
-                case 't':
-                    return Keys.T;
-                case 'y':
-                    return Keys.Y;
-                case 'u':
-                    return Keys.U;
-                case 'i':
-                    return Keys.I;
-                case 'o':
-                    return Keys.O;
-                case 'p':
-                    return Keys.P;
-                case 'a':
-                    return Keys.A;
-                case 's':
-                    return Keys.S;
-                case 'd':
-                    return Keys.D;
-                case 'f':
-                    return Keys.F;
-                case 'g':
-                    return Keys.G;
-                case 'h':
-                    return Keys.H;
-                case 'j':
-                    return Keys.J;
-                case 'k':
-                    return Keys.K;
-                case 'l':
-                    return Keys.L;
-                case 'z':
-                    return Keys.Z;
-                case 'x':
-                    return Keys.X;
-                case 'c':
-                    return Keys.C;
-                case 'v':
-                    return Keys.V;
-                case 'b':
-                    return Keys.B;
-                case 'n':
-                    return Keys.N;
-                case 'm':
-                    return Keys.M;
-                case '*':
-                    return Keys.Multiply;
-                default:
-                    break;
-            }
-            return Keys.Space;
-
         }
         public static void HuyKeyPress(KeyDirectX keyCode)
         {
@@ -1213,7 +1030,7 @@ namespace WindowsFormsApp1
     }
     public enum KeyDirectX : ushort
     {
-        Sleep = 223, Next = 209, Stop = 149, Convert = 121, Decimal = 83, X = 45, Y = 21, Escape = 1, Circumflex = 144, PageDown = 209, DownArrow = 208, RightArrow = 205, LeftArrow = 203, PageUp = 201, UpArrow = 200, RightAlt = 184, NumPadSlash = 181, NumPadPeriod = 83, NumPadPlus = 78, NumPadMinus = 74, CapsLock = 58, LeftAlt = 56, NumPadStar = 55, BackSpace = 14, MediaSelect = 237, Mail = 236, MyComputer = 235, WebBack = 234, WebForward = 233, WebStop = 232, WebRefresh = 231, WebFavorites = 230, WebSearch = 229, Wake = 227, Power = 222, Apps = 221, RightWindows = 220, LeftWindows = 219, Down = 208, End = 207, Prior = 201, Up = 200, Home = 199, RightMenu = 184, SysRq = 183, Divide = 181, NumPadComma = 179, WebHome = 178, VolumeUp = 176, VolumeDown = 174, MediaStop = 164, PlayPause = 162, Calculator = 161, Mute = 160, RightControl = 157, NumPadEnter = 156, NextTrack = 153, Unlabeled = 151, AX = 150, Kanji = 148, Underline = 147, Colon = 146, At = 145, PrevTrack = 144, NumPadEquals = 141, AbntC2 = 126, Yen = 125, NoConvert = 123, AbntC1 = 115, Kana = 112, F15 = 102, F14 = 101, F13 = 100, F12 = 88, F11 = 87, OEM102 = 86, NumPad0 = 82, NumPad3 = 81, NumPad2 = 80, NumPad1 = 79, NumPad6 = 77, NumPad5 = 76, NumPad4 = 75, Subtract = 74, NumPad9 = 73, NumPad8 = 72, NumPad7 = 71, Scroll = 70, Numlock = 69, F10 = 68, F9 = 67, F8 = 66, F7 = 65, F6 = 64, F5 = 63, F4 = 62, F3 = 61, F2 = 60, F1 = 59, Capital = 58, Space = 57, LeftMenu = 56, Multiply = 55, RightShift = 54, Slash = 53, Period = 52, Comma = 51, M = 50, N = 49, B = 48, V = 47, C = 46, Z = 44, BackSlash = 43, LeftShift = 42, Grave = 41, Apostrophe = 40, SemiColon = 39, L = 38, K = 37, J = 36, H = 35, G = 34, F = 33, D = 32, S = 31, A = 30, LeftControl = 29, Return = 28, RightBracket = 27, LeftBracket = 26, P = 25, O = 24, I = 23, U = 22, T = 20, R = 19, E = 18, W = 17, Tab = 15, Back = 14, Equals = 13, Minus = 12, D0 = 11, D9 = 10, D8 = 9, D7 = 8, D6 = 7, D5 = 6, D4 = 5, D3 = 4, D2 = 3, D1 = 2, Insert = 210, Right = 205, Left = 203, Pause = 197, Add = 78, Delete = 211, Q = 16
+        Sleep = 223, Next = 209, Stop = 149, Convert = 121, Decimal = 83, X = 45, Y = 21, Escape = 1, Circumflex = 144, PageDown = 209, DownArrow = 208, RightArrow = 205, LeftArrow = 203, PageUp = 201, UpArrow = 200, RightAlt = 184, NumPadSlash = 181, NumPadPeriod = 83, NumPadPlus = 78, NumPadMinus = 74, CapsLock = 58, LeftAlt = 56, NumPadStar = 55, BackSpace = 14, MediaSelect = 237, Mail = 236, MyComputer = 235, WebBack = 234, WebForward = 233, WebStop = 232, WebRefresh = 231, WebFavorites = 230, WebSearch = 229, Wake = 227, Power = 222, Apps = 221, RightWindows = 220, LeftWindows = 219, Down = 208, End = 207, Prior = 201, Up = 200, Home = 199, RightMenu = 184, SysRq = 183, Divide = 181, NumPadComma = 179, WebHome = 178, VolumeUp = 176, VolumeDown = 174, MediaStop = 164, PlayPause = 162, Calculator = 161, Mute = 160, RightControl = 157, NumPadEnter = 156, NextTrack = 153, Unlabeled = 151, AX = 150, Kanji = 148, Underline = 147, Colon = 146, At = 145, PrevTrack = 144, NumPadEquals = 141, AbntC2 = 126, Yen = 125, NoConvert = 123, AbntC1 = 115, Kana = 112, F15 = 102, F14 = 101, F13 = 100, F12 = 88, F11 = 87, OEM102 = 86, NumPad0 = 82, NumPad3 = 81, NumPad2 = 80, NumPad1 = 79, NumPad6 = 77, NumPad5 = 76, NumPad4 = 75, Subtract = 74, NumPad9 = 73, NumPad8 = 72, NumPad7 = 71, Scroll = 70, Numlock = 69, F10 = 68, F9 = 67, F8 = 66, F7 = 65, F6 = 64, F5 = 63, F4 = 62, F3 = 61, F2 = 60, F1 = 59, Capital = 58, Space = 57, LeftMenu = 56, Multiply = 55, RightShift = 54, Slash = 53, Period = 52, Comma = 51, M = 50, N = 49, B = 48, V = 47, C = 46, Z = 44, BackSlash = 43, LeftShift = 42, Grave = 41, Apostrophe = 40, SemiColon = 39, L = 38, K = 37, J = 36, H = 35, G = 34, F = 33, D = 32, S = 31, A = 30, LeftControl = 29, Return = 28, RightBracket = 27, LeftBracket = 26, P = 25, O = 24, I = 23, U = 22, T = 20, R = 19, E = 18, W = 17, Tab = 15, Back = 14, Equals = 13, Minus = 12, D0 = 11, D9 = 10, D8 = 9, D7 = 8, D6 = 7, D5 = 6, D4 = 5, D3 = 4, D2 = 3, D1 = 2, Insert = 210, Right = 205, Left = 203, Pause = 197, Add = 78, Delete = 211, Q = 16, Nothing = 0
     }
 }
 public struct INPUT
@@ -1268,14 +1085,12 @@ public struct MOUSEINPUT
 
     public IntPtr ExtraInfo;
 }
-
 [StructLayout(LayoutKind.Sequential)]
 public struct POINT
 {
     public Int32 x;
     public Int32 y;
 }
-
 [StructLayout(LayoutKind.Sequential)]
 public struct CURSORINFO
 {

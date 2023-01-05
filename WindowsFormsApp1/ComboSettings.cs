@@ -122,7 +122,91 @@ namespace WindowsFormsApp1
                 default:
                     break;
             }
-            return KeyDirectX.Space;
+            return KeyDirectX.Nothing;
+        }
+        public static Keys GetKeySelect(char item)
+        {
+            switch (item)
+            {
+                case '0':
+                    return Keys.D0;
+                case '1':
+                    return Keys.D1;
+                case '2':
+                    return Keys.D2;
+                case '3':
+                    return Keys.D3;
+                case '4':
+                    return Keys.D4;
+                case '5':
+                    return Keys.D5;
+                case '6':
+                    return Keys.D6;
+                case '7':
+                    return Keys.D7;
+                case '8':
+                    return Keys.D8;
+                case '9':
+                    return Keys.D9;
+                case 'q':
+                    return Keys.Q;
+                case 'w':
+                    return Keys.W;
+                case 'e':
+                    return Keys.E;
+                case 'r':
+                    return Keys.R;
+                case 't':
+                    return Keys.T;
+                case 'y':
+                    return Keys.Y;
+                case 'u':
+                    return Keys.U;
+                case 'i':
+                    return Keys.I;
+                case 'o':
+                    return Keys.O;
+                case 'p':
+                    return Keys.P;
+                case 'a':
+                    return Keys.A;
+                case 's':
+                    return Keys.S;
+                case 'd':
+                    return Keys.D;
+                case 'f':
+                    return Keys.F;
+                case 'g':
+                    return Keys.G;
+                case 'h':
+                    return Keys.H;
+                case 'j':
+                    return Keys.J;
+                case 'k':
+                    return Keys.K;
+                case 'l':
+                    return Keys.L;
+                case 'z':
+                    return Keys.Z;
+                case 'x':
+                    return Keys.X;
+                case 'c':
+                    return Keys.C;
+                case 'v':
+                    return Keys.V;
+                case 'b':
+                    return Keys.B;
+                case 'n':
+                    return Keys.N;
+                case 'm':
+                    return Keys.M;
+                case '*':
+                    return Keys.Multiply;
+                default:
+                    break;
+            }
+            return Keys.Space;
+
         }
     }
     public class ComboKey
@@ -131,36 +215,52 @@ namespace WindowsFormsApp1
         string multikeys;
         List<KeyDirectX> combo;
         DateTime lastCall;
-        string callWithMouse;
-        bool qMustBeCall;
+        ComboKeyOption option;
+
         public Keys Keys { get => keys; set => keys = value; }
         public string Multikeys { get => multikeys; set => multikeys = value; }
         public List<KeyDirectX> Combo { get => combo; set => combo = value; }
         public DateTime LastCall { get => lastCall; set => lastCall = value; }
-        public string CallWithMouse { get => callWithMouse; set => callWithMouse = value; }
-        public bool QMustBeCall { get => qMustBeCall; set => qMustBeCall = value; }
+        public ComboKeyOption Option { get => option; set => option = value; }
 
-        public ComboKey(Keys m_key, string m_combo)
+
+        //public ComboKey(Keys m_key, string m_combo)
+        //{
+        //    keys = m_key;
+        //    Combo = new List<KeyDirectX>();
+        //    foreach (char item in m_combo.ToLower())
+        //    {
+        //        Combo.Add(ComboSettings.GetKeyDirectXSelect(item));
+        //    }
+        //    LastCall = DateTime.Now;
+        //    //SpecialHero = "";
+        //    //CallWithMouse = "default";
+        //    //LockMouseUntilPressThis = KeyDirectX.Nothing;
+        //}
+        public ComboKey(string inputkeys, string m_combo, object m_option)
         {
-            keys = m_key;
+            if (inputkeys.Length == 1)
+            {
+                keys = ComboSettings.GetKeySelect(inputkeys[0]);
+            }
+            else
+            {
+                multikeys = inputkeys;
+            }
             Combo = new List<KeyDirectX>();
             foreach (char item in m_combo.ToLower())
             {
                 Combo.Add(ComboSettings.GetKeyDirectXSelect(item));
             }
             LastCall = DateTime.Now;
-            CallWithMouse = "default";
-        }
-        public ComboKey(string m_multikey, string m_combo)
-        {
-            multikeys = m_multikey;
-            Combo = new List<KeyDirectX>();
-            foreach (char item in m_combo.ToLower())
+            if (m_option == null)
             {
-                Combo.Add(ComboSettings.GetKeyDirectXSelect(item));
+                Option = new ComboKeyOption();
             }
-            LastCall = DateTime.Now;
-            CallWithMouse = "default";
+            else
+            {
+                Option = (ComboKeyOption)m_option;
+            }
         }
     }
     public class ComboOption
@@ -168,15 +268,35 @@ namespace WindowsFormsApp1
         Point pointQ;
         Size sizeQ;
         bool saveImg;
+        int blinkMin;
+        int blinkDelay;
 
         public Point PointQ { get => pointQ; set => pointQ = value; }
         public Size SizeQ { get => sizeQ; set => sizeQ = value; }
         public bool SaveImg { get => saveImg; set => saveImg = value; }
+        public int BlinkMin { get => blinkMin; set => blinkMin = value; }
+        public int BlinkDelay { get => blinkDelay; set => blinkDelay = value; }
+
         public ComboOption()
         {
             sizeQ = new Size(15, 15);
             pointQ = new Point(810, 965);
             saveImg = false;
+            blinkMin = 200;
+            BlinkDelay = 0;
+        }
+    }
+    public class ComboKeyOption
+    {
+        string specialHero = "";// tinker - dam bao Q duoc moi combo tiep
+        string callWithMouse = "default";//kiem tra hinh dang chuot truoc khi goi combo
+        KeyDirectX lockMouseUntilPressThis = KeyDirectX.Nothing; // khoa chuot o vi tri hien tai den khi key nay duoc send
+        public string CallWithMouse { get => callWithMouse; set => callWithMouse = value; }
+        public string SpecialHero { get => specialHero; set => specialHero = value; }
+        public KeyDirectX LockMouseUntilPressThis { get => lockMouseUntilPressThis; set => lockMouseUntilPressThis = value; }
+        public ComboKeyOption()
+        {
+
         }
     }
 }
