@@ -32,12 +32,17 @@ namespace WindowsFormsApp1
         DateTime lastUpdateOrder;
         Bitmap enemy;
         Bitmap ally;
+        Bitmap r_Invoker;
+        Bitmap Invoker_ThienThach_ChuaDung;
+        // Bitmap Invoker_MiniStun_DaDung;
         private int inner_interval = 1; //milisecond
         private int interval = 50; //milisecond
         private int delayBetweenCombos = 500; //milisecond
         private TimeSpan span_interval = TimeSpan.FromMilliseconds(20);
         // private int clearComboOrder = 1;//second
         bool runHandler = true;
+        Keys toogleOnOff;
+        bool OnOff = true;
         public Dota()
         {
             InitializeComponent();
@@ -52,8 +57,13 @@ namespace WindowsFormsApp1
         static extern bool GetClipCursor(out RECT lpRect);
         private void Dota_Load(object sender, EventArgs e)
         {
+            #region Load Image Constrain
             enemy = new Bitmap(System.IO.Directory.GetCurrentDirectory() + @"\Img\CursorEnemy.PNG");
             ally = new Bitmap(System.IO.Directory.GetCurrentDirectory() + @"\Img\CursorAlly.PNG");
+            r_Invoker = LoadBitMapRBG(System.IO.Directory.GetCurrentDirectory() + @"\Img\R_Invoker.PNG");
+            Invoker_ThienThach_ChuaDung = LoadBitMapRBG(System.IO.Directory.GetCurrentDirectory() + @"\Img\Invoker_ThienThach_ChuaDung.PNG");
+            //  Invoker_MiniStun_DaDung = LoadBitMapRBG(System.IO.Directory.GetCurrentDirectory() + @"\Img\Invoker_MiniStun_DaDung.PNG");
+            #endregion
             keyConvert = new KeysConverter();
             nudTimeSpanIn.Controls.RemoveAt(0);
             nudTimeSpanOut.Controls.RemoveAt(0);
@@ -78,10 +88,20 @@ namespace WindowsFormsApp1
             LoadListKeys();
             options = JsonConvert.DeserializeObject<ComboOption>(File.ReadAllText(pathOption));
 
+            toogleOnOff = ComboSettings.GetKeySelect(options.OnOff[0]);
+
             //ComboKeyOption testOptions = new ComboKeyOption();
             //File.WriteAllText(pathOption, JsonConvert.SerializeObject(testOptions));
 
         }
+
+        private Bitmap LoadBitMapRBG(string v)
+        {
+            Bitmap bmp = new Bitmap(v);
+            Bitmap result = bmp.Clone(new Rectangle(0, 0, bmp.Width, bmp.Height), PixelFormat.Format32bppRgb);
+            return result;
+        }
+
         private void LoadListKeys()
         {
             l_keys = new List<ComboKey>();
@@ -361,7 +381,25 @@ namespace WindowsFormsApp1
         }
         private void HookManager_KeyDown(object sender, KeyEventArgs e)
         {
-            //  DateTime start = DateTime.Now;
+            //DateTime start = DateTime.Now;
+            //MessageBox.Show(e.KeyCode.ToString());
+            //return;
+            if (e.KeyCode == toogleOnOff)
+            {
+                OnOff = !OnOff;
+                if (OnOff)
+                {
+                    this.Text = "Dota";
+                }
+                else
+                {
+                    this.Text = "Dota-Off";
+                }
+            }
+            if (!OnOff)
+            {
+                return;
+            }
             HookManager.KeyDown -= HookManager_KeyDown;
 
             foreach (ComboKey comboKey in l_keys)
@@ -521,6 +559,8 @@ namespace WindowsFormsApp1
                     return CompareBitmapsFast(ally, GetCursorBitmap());
                 case "notAlly":
                     return !CompareBitmapsFast(ally, GetCursorBitmap());
+                case "notEnemy":
+                    return !CompareBitmapsFast(enemy, GetCursorBitmap());
                 default:
                     return true;
             }
@@ -538,6 +578,36 @@ namespace WindowsFormsApp1
                 ClipCursor(ref rect);
             }
             bool exitLoop = false;
+            if (combo.L_code_combo.Count > 0)
+            {
+                switch (combo.Option.SpecialHero)
+                {
+                    case "Invoker":
+                        if (combo.Option.ComboName == "code1")
+                        {
+                            //Chup anh nut D
+                            Bitmap bmp1 = CaptureHelper.CaptureImage(options.SizeD, options.PointD);
+                            if (options.SaveImg)
+                            {
+                                bmp1.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\D_test1.PNG");
+                            }
+                            if (CompareBitmapsSlow(bmp1, Invoker_ThienThach_ChuaDung, 95))
+                            {
+                                combo.Combo = combo.L_code_combo[0];
+                               // this.Text = "thienthach-chuadung";
+                            }
+                            //else if (CompareBitmapsSlow(bmp1, Invoker_MiniStun_DaDung,95)) { combo.Combo = combo.L_code_combo[1]; this.Text = "ministun-dadung"; }
+                            else
+                            {
+                                combo.Combo = combo.L_code_combo[1];
+                                //this.Text = "conlai"; 
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
             foreach (KeyDirectX item in combo.Combo)
             {
                 Thread.Sleep(inner_interval);
@@ -575,8 +645,11 @@ namespace WindowsFormsApp1
                                 lanthu++;
                                 if (lanthu > 4)
                                 {
-                                    HuyKeyPress(KeyDirectX.S);
-                                    exitLoop = true;
+                                    if (!options.ContinueAfterFailed)
+                                    {
+                                        HuyKeyPress(KeyDirectX.S);
+                                        exitLoop = true;
+                                    }
                                     break;
                                 }
                                 Thread.Sleep(100);
@@ -605,6 +678,44 @@ namespace WindowsFormsApp1
                                     }
                                     HuyKeyPress(item);
                                 }
+                            }
+                            else
+                            {
+                                HuyKeyPress(item);
+                            }
+                            break;
+                        case "Invoker":
+                            if (item == KeyDirectX.Subtract || item == KeyDirectX.NumPadPlus)
+                            {
+                                int lanthu = 0;
+                                chaylai:
+                                lanthu++;
+                                //Chup anh nut R
+                                Bitmap bmp1 = CaptureHelper.CaptureImage(options.SizeR, options.PointR);
+                                if (options.SaveImg)
+                                {
+                                    bmp1.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\R_test1.PNG");
+                                }
+                                if (lanthu > 5)
+                                {
+                                    if (!options.ContinueAfterFailed)
+                                    {
+                                        if (combo.Combo[0] == KeyDirectX.Decimal)
+                                        {
+                                            //this.Text = "fail";
+                                            HuyKeyPress(KeyDirectX.Decimal);
+                                        }
+                                        exitLoop = true;
+                                    }
+                                    if (item == KeyDirectX.NumPadPlus)
+                                    {
+                                        exitLoop = false;
+                                    }
+                                    break;
+                                }
+                                if (CompareBitmapsSlow(bmp1, r_Invoker, 95)) { break; }
+                                Thread.Sleep(200);
+                                goto chaylai;
                             }
                             else
                             {
@@ -1022,6 +1133,47 @@ namespace WindowsFormsApp1
                 }
             }
 
+            bmp1.UnlockBits(bitmapData1);
+            bmp2.UnlockBits(bitmapData2);
+
+            return result;
+        }
+        public static bool CompareBitmapsSlow(Bitmap bmp1, Bitmap bmp2, int percentMin)
+        {
+            if (bmp1 == null || bmp2 == null)
+                return false;
+            if (object.Equals(bmp1, bmp2))
+                return true;
+            if (!bmp1.Size.Equals(bmp2.Size) || !bmp1.PixelFormat.Equals(bmp2.PixelFormat))
+                return false;
+
+            int bytes = bmp1.Width * bmp1.Height * (Image.GetPixelFormatSize(bmp1.PixelFormat) / 8);
+
+            bool result = true;
+            byte[] b1bytes = new byte[bytes];
+            byte[] b2bytes = new byte[bytes];
+
+            BitmapData bitmapData1 = bmp1.LockBits(new Rectangle(0, 0, bmp1.Width, bmp1.Height), ImageLockMode.ReadOnly, bmp1.PixelFormat);
+            BitmapData bitmapData2 = bmp2.LockBits(new Rectangle(0, 0, bmp2.Width, bmp2.Height), ImageLockMode.ReadOnly, bmp2.PixelFormat);
+
+            Marshal.Copy(bitmapData1.Scan0, b1bytes, 0, bytes);
+            Marshal.Copy(bitmapData2.Scan0, b2bytes, 0, bytes);
+
+            int bytesDiff = 0;
+            for (int n = 0; n <= bytes - 1; n++)
+            {
+                if (Math.Abs(b1bytes[n] - b2bytes[n]) > 10)
+                {
+                    bytesDiff++;
+                    //result = false;
+                    //break;
+                }
+            }
+            int percent = 100 - (int)(100 * bytesDiff / bytes);
+            if (percent < percentMin)
+            {
+                result = false;
+            }
             bmp1.UnlockBits(bitmapData1);
             bmp2.UnlockBits(bitmapData2);
 

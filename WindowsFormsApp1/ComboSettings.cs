@@ -119,6 +119,14 @@ namespace WindowsFormsApp1
                     return KeyDirectX.M;
                 case '*':
                     return KeyDirectX.NumPadStar;
+                case '`':
+                    return KeyDirectX.Grave;
+                case '.':
+                    return KeyDirectX.Decimal;
+                case '-':
+                    return KeyDirectX.Subtract;
+                case '+':
+                    return KeyDirectX.NumPadPlus;
                 default:
                     break;
             }
@@ -202,6 +210,14 @@ namespace WindowsFormsApp1
                     return Keys.M;
                 case '*':
                     return Keys.Multiply;
+                case '`':
+                    return Keys.Oemtilde;
+                case '.':
+                    return Keys.Decimal;
+                case '-':
+                    return Keys.Subtract;
+                case '+':
+                    return Keys.Add;
                 default:
                     break;
             }
@@ -216,12 +232,13 @@ namespace WindowsFormsApp1
         List<KeyDirectX> combo;
         DateTime lastCall;
         ComboKeyOption option;
-
+        List<List<KeyDirectX>> l_code_combo;
         public Keys Keys { get => keys; set => keys = value; }
         public string Multikeys { get => multikeys; set => multikeys = value; }
         public List<KeyDirectX> Combo { get => combo; set => combo = value; }
         public DateTime LastCall { get => lastCall; set => lastCall = value; }
         public ComboKeyOption Option { get => option; set => option = value; }
+        public List<List<KeyDirectX>> L_code_combo { get => l_code_combo; set => l_code_combo = value; }
 
 
         //public ComboKey(Keys m_key, string m_combo)
@@ -247,11 +264,6 @@ namespace WindowsFormsApp1
             {
                 multikeys = inputkeys;
             }
-            Combo = new List<KeyDirectX>();
-            foreach (char item in m_combo.ToLower())
-            {
-                Combo.Add(ComboSettings.GetKeyDirectXSelect(item));
-            }
             LastCall = DateTime.Now;
             if (m_option == null)
             {
@@ -260,6 +272,44 @@ namespace WindowsFormsApp1
             else
             {
                 Option = (ComboKeyOption)m_option;
+            }
+            Combo = new List<KeyDirectX>();
+            L_code_combo = new List<List<KeyDirectX>>();
+            if (m_combo.StartsWith("code"))
+            {
+                string[] list_cb = m_combo.Split(';');
+                Option.ComboName = list_cb[0];
+                switch (Option.SpecialHero)
+                {
+                    case "Invoker":
+                        if (Option.ComboName==("code1"))
+                        {
+                            //List<string> list_cb = new List<string>() { "ew-qq-sff-d-dd-wwer*ftx-eq*x", "-qq-sff-d-dd-wwer*ftx-eq*x" };
+                            //List<string> list_cb = new List<string>() { "ew-qq-sew", "-qq-sew" };
+                           
+                            //foreach (string cb in list_cb)
+                            for (int i = 1; i < list_cb.Length; i++)
+                            {
+                                string cb = list_cb[i];
+                                List<KeyDirectX> temp_combo = new List<KeyDirectX>();
+                                foreach (char item in cb.ToLower())
+                                {
+                                    temp_combo.Add(ComboSettings.GetKeyDirectXSelect(item));
+                                }
+                                L_code_combo.Add(temp_combo);
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                foreach (char item in m_combo.ToLower())
+                {
+                    Combo.Add(ComboSettings.GetKeyDirectXSelect(item));
+                }
             }
         }
     }
@@ -270,20 +320,38 @@ namespace WindowsFormsApp1
         bool saveImg;
         int blinkMin;
         int blinkDelay;
+        string onOff;
+        bool continueAfterFailed;
+        Point pointR;
+        Size sizeR;
+        Point pointD;
+        Size sizeD;
 
         public Point PointQ { get => pointQ; set => pointQ = value; }
         public Size SizeQ { get => sizeQ; set => sizeQ = value; }
         public bool SaveImg { get => saveImg; set => saveImg = value; }
         public int BlinkMin { get => blinkMin; set => blinkMin = value; }
         public int BlinkDelay { get => blinkDelay; set => blinkDelay = value; }
+        public string OnOff { get => onOff; set => onOff = value; }
+        public bool ContinueAfterFailed { get => continueAfterFailed; set => continueAfterFailed = value; }
+        public Point PointR { get => pointR; set => pointR = value; }
+        public Size SizeR { get => sizeR; set => sizeR = value; }
+        public Point PointD { get => pointD; set => pointD = value; }
+        public Size SizeD { get => sizeD; set => sizeD = value; }
 
         public ComboOption()
         {
             sizeQ = new Size(15, 15);
-            pointQ = new Point(810, 965);
+            pointQ = new Point(800, 950);
             saveImg = false;
             blinkMin = 200;
             BlinkDelay = 0;
+            OnOff = "`";
+            ContinueAfterFailed = false;
+            SizeR = new Size(15, 15);
+            PointR = new Point(1100, 950);
+            SizeD = new Size(15, 15);
+            PointD = new Point(1035, 950);
         }
     }
     public class ComboKeyOption
@@ -294,9 +362,11 @@ namespace WindowsFormsApp1
         public string CallWithMouse { get => callWithMouse; set => callWithMouse = value; }
         public string SpecialHero { get => specialHero; set => specialHero = value; }
         public KeyDirectX LockMouseUntilPressThis { get => lockMouseUntilPressThis; set => lockMouseUntilPressThis = value; }
+        string comboName;
+        public string ComboName { get => comboName; set => comboName = value; }
         public ComboKeyOption()
         {
-
+            ComboName = "";
         }
     }
 }

@@ -1,1 +1,1 @@
-{"PointQ":"800, 950","SizeQ":"15, 15","SaveImg":false,"BlinkMin":200,"BlinkDelay":0}
+{"PointQ":"800, 950","SizeQ":"15, 15","SaveImg":false,"ContinueAfterFailed":false,"BlinkMin":200,"BlinkDelay":100,"OnOff":"."}
