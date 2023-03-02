@@ -34,7 +34,9 @@ namespace WindowsFormsApp1
         Bitmap ally;
         Bitmap r_Invoker;
         Bitmap Invoker_ThienThach_ChuaDung;
-        // Bitmap Invoker_MiniStun_DaDung;
+        Bitmap Invoker_MiniStun_ChuaDung;
+        Bitmap Invoker_TuongBang_ChuaDung;
+        Bitmap Invoker_ThaiDuong_ChuaDung;
         private int inner_interval = 1; //milisecond
         private int interval = 50; //milisecond
         private int delayBetweenCombos = 500; //milisecond
@@ -55,14 +57,18 @@ namespace WindowsFormsApp1
         static extern bool ClipCursor(ref RECT lpRect);
         [DllImport("user32.dll", SetLastError = true)]
         static extern bool GetClipCursor(out RECT lpRect);
+        [DllImport("User32.Dll")]
+        public static extern long SetCursorPos(int x, int y);
         private void Dota_Load(object sender, EventArgs e)
         {
             #region Load Image Constrain
             enemy = new Bitmap(System.IO.Directory.GetCurrentDirectory() + @"\Img\CursorEnemy.PNG");
             ally = new Bitmap(System.IO.Directory.GetCurrentDirectory() + @"\Img\CursorAlly.PNG");
-            r_Invoker = LoadBitMapRBG(System.IO.Directory.GetCurrentDirectory() + @"\Img\R_Invoker.PNG");
-            Invoker_ThienThach_ChuaDung = LoadBitMapRBG(System.IO.Directory.GetCurrentDirectory() + @"\Img\Invoker_ThienThach_ChuaDung.PNG");
-            //  Invoker_MiniStun_DaDung = LoadBitMapRBG(System.IO.Directory.GetCurrentDirectory() + @"\Img\Invoker_MiniStun_DaDung.PNG");
+            r_Invoker = LoadBitMapRBG(System.IO.Directory.GetCurrentDirectory() + @"\Img\Invoker\R_Invoker.PNG");
+            Invoker_ThienThach_ChuaDung = LoadBitMapRBG(System.IO.Directory.GetCurrentDirectory() + @"\Img\Invoker\Invoker_ThienThach_ChuaDung.PNG");
+            Invoker_MiniStun_ChuaDung = LoadBitMapRBG(System.IO.Directory.GetCurrentDirectory() + @"\Img\Invoker\Invoker_MiniStun_ChuaDung.PNG");
+            Invoker_TuongBang_ChuaDung = LoadBitMapRBG(System.IO.Directory.GetCurrentDirectory() + @"\Img\Invoker\Invoker_TuongBang_ChuaDung.PNG");
+            Invoker_ThaiDuong_ChuaDung = LoadBitMapRBG(System.IO.Directory.GetCurrentDirectory() + @"\Img\Invoker\Invoker_ThaiDuong_ChuaDung.PNG");
             #endregion
             keyConvert = new KeysConverter();
             nudTimeSpanIn.Controls.RemoveAt(0);
@@ -92,7 +98,6 @@ namespace WindowsFormsApp1
 
             //ComboKeyOption testOptions = new ComboKeyOption();
             //File.WriteAllText(pathOption, JsonConvert.SerializeObject(testOptions));
-
         }
 
         private Bitmap LoadBitMapRBG(string v)
@@ -101,7 +106,6 @@ namespace WindowsFormsApp1
             Bitmap result = bmp.Clone(new Rectangle(0, 0, bmp.Width, bmp.Height), PixelFormat.Format32bppRgb);
             return result;
         }
-
         private void LoadListKeys()
         {
             l_keys = new List<ComboKey>();
@@ -396,6 +400,16 @@ namespace WindowsFormsApp1
                     this.Text = "Dota-Off";
                 }
             }
+            if (e.KeyCode == Keys.OemQuestion || e.KeyCode == Keys.Divide)
+            {
+                this.Text = "Dota";
+                OnOff = true;
+                return;
+            }
+            //else
+            //{
+            //    this.Text += e.KeyCode.ToString();
+            //}
             if (!OnOff)
             {
                 return;
@@ -583,25 +597,127 @@ namespace WindowsFormsApp1
                 switch (combo.Option.SpecialHero)
                 {
                     case "Invoker":
-                        if (combo.Option.ComboName == "code1")
+                        if (combo.Option.ComboName == "code1" || combo.Option.ComboName == "code2" || combo.Option.ComboName == "code3")
                         {
-                            //Chup anh nut D
+                            //this.Text = "Dota";
+                            //Chup anh nut D,F
                             Bitmap bmp1 = CaptureHelper.CaptureImage(options.SizeD, options.PointD);
+                            Bitmap bmp2 = CaptureHelper.CaptureImage(options.SizeF, options.PointF);
+                            Bitmap sosanh = Invoker_ThienThach_ChuaDung;
+                            Bitmap sosanh2 = Invoker_MiniStun_ChuaDung;
+                            if (combo.Option.ComboName == "code2")
+                            {
+                                sosanh = Invoker_MiniStun_ChuaDung;
+                                sosanh2 = Invoker_TuongBang_ChuaDung;
+                            }
+                            if (combo.Option.ComboName == "code3")
+                            {
+                                sosanh = Invoker_TuongBang_ChuaDung;
+                                sosanh2 = Invoker_ThaiDuong_ChuaDung;
+                            }
                             if (options.SaveImg)
                             {
                                 bmp1.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\D_test1.PNG");
+                                bmp2.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\F_test1.PNG");
                             }
-                            if (CompareBitmapsSlow(bmp1, Invoker_ThienThach_ChuaDung, 95))
+                            if (CompareBitmapsSlow(bmp1, sosanh, 95))
                             {
                                 combo.Combo = combo.L_code_combo[0];
-                               // this.Text = "thienthach-chuadung";
+                                // this.Text = "thienthach-chuadung";
                             }
                             //else if (CompareBitmapsSlow(bmp1, Invoker_MiniStun_DaDung,95)) { combo.Combo = combo.L_code_combo[1]; this.Text = "ministun-dadung"; }
                             else
                             {
-                                combo.Combo = combo.L_code_combo[1];
+                                if (CompareBitmapsSlow(bmp1, sosanh2, 95) && CompareBitmapsSlow(bmp2, sosanh, 95))
+                                {
+                                    //this.Text = "Trung";
+                                    goto endCombo;
+                                }
+                                else
+                                {
+                                    combo.Combo = combo.L_code_combo[1];
+                                }
                                 //this.Text = "conlai"; 
                             }
+                        }
+                        else if (combo.Option.ComboName == "code4")
+                        {
+                            HuyKeyPress(KeyDirectX.S);
+                            this.Text = "Dota";
+                            //Chup anh nut D,F
+                            Bitmap bmp1 = CaptureHelper.CaptureImage(options.SizeD, options.PointD);
+                            Bitmap bmp2 = CaptureHelper.CaptureImage(options.SizeF, options.PointF);
+                            if (options.SaveImg)
+                            {
+                                bmp1.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\D_test1.PNG");
+                                bmp2.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\F_test1.PNG");
+                            }
+                            KeyDirectX keyActive = KeyDirectX.Nothing;
+                            if (CompareBitmapsSlow(bmp1, Invoker_TuongBang_ChuaDung, 95))
+                            {
+                                keyActive = KeyDirectX.D;
+                            }
+                            else if (CompareBitmapsSlow(bmp2, Invoker_TuongBang_ChuaDung, 95))
+                            {
+                                keyActive = KeyDirectX.F;
+                            }
+                            else
+                            {
+                                combo.Combo = combo.L_code_combo[0];
+                                goto boquaclickchuot;
+                            }
+
+                            int x = (int)(0.5 * (current_rect.Left + current_rect.Right));
+                            int y = (int)(0.5 * (current_rect.Top + current_rect.Bottom));
+
+                            int goc_chon_i = 0;
+                            double min_khoangcach = 99;
+                            Point current_relate = new Point(current.X - x, y - current.Y);
+                            //int sLThoaKhoangCach = 0;
+                            //string l_gocChon = "";
+                            foreach (LineTuongBang item in user.L_tuongbang)
+                            {
+                                double khoangcach = 100;
+                                if (item.IsApproval(current_relate, out khoangcach))
+                                {
+                                    //sLThoaKhoangCach++;
+                                    if (min_khoangcach > khoangcach)
+                                    {
+                                        min_khoangcach = khoangcach;
+                                        goc_chon_i = item.Goc_i;
+                                    }
+                                }
+                                //if (khoangcach < 25)
+                                //{
+                                //    l_gocChon += item.Goc_i.ToString() + "---" + khoangcach.ToString() + ";";
+                                //    sLThoaKhoangCach++;
+                                //}
+                            }
+                            //MessageBox.Show(l_gocChon);
+                            //this.Text = current.X.ToString() + "-" + current.Y.ToString() + "_" + goc_chon_i.ToString() + "_" + min_khoangcach.ToString() + "_" + sLThoaKhoangCach.ToString();
+                            if (min_khoangcach == 99)
+                            {
+                                goto endCombo;
+                            }
+                            double goc_chon = 2 * goc_chon_i * Math.PI / 36;
+                            int cast_x = (int)(x + 200 * Math.Cos(goc_chon));
+                            int cast_y = (int)(y + 200 * Math.Sin(goc_chon));
+                            SetCursorPos(cast_x, cast_y);
+                            Thread.Sleep(20);
+                            AutoControl.MouseClick(cast_x, cast_y, EMouseKey.DOUBLE_RIGHT);//cick box ten tai khoan
+                            Thread.Sleep(100);
+                            HuyKeyPress(KeyDirectX.S);
+                            HuyKeyPress(keyActive);
+                            Thread.Sleep(100);
+                            SetCursorPos(current.X, current.Y);
+                            goto endCombo;
+                            boquaclickchuot:;
+                        }
+                        break;
+                    case "Tinker-code":
+                        if (combo.Option.ComboName == "code1")
+                        {
+                            combo.Combo = combo.L_code_combo[0];
                         }
                         break;
                     default:
@@ -684,39 +800,86 @@ namespace WindowsFormsApp1
                                 HuyKeyPress(item);
                             }
                             break;
+                        case "Tinker-code":
+                            if ((item == KeyDirectX.D2 && combo.Option.ComboName == "code1"))
+                            {
+                                if (CompareBitmapsFast(enemy, GetCursorBitmap()))
+                                {
+                                    //Lấy vị trí chuột hiện tại
+                                    Point rightNow = GetCursorPoint();
+                                    //Move chuột về vị trí tính toán
+                                    Point tinhToan = TinhToanViTri(current_rect, rightNow, 400);
+
+                                    SetCursorPos(tinhToan.X, tinhToan.Y);
+                                    //Cast 
+                                    Thread.Sleep(50);
+                                    HuyKeyPress(item);
+                                    //Đưa chuột về vị trí ban đầu
+                                    Thread.Sleep(50);
+                                    SetCursorPos(rightNow.X, rightNow.Y);
+                                    break;
+                                }
+                            }
+                            HuyKeyPress(item);
+                            break;
                         case "Invoker":
-                            if (item == KeyDirectX.Subtract || item == KeyDirectX.NumPadPlus)
+                            if (item == KeyDirectX.NumPadMinus || item == KeyDirectX.NumPadPlus)
                             {
                                 int lanthu = 0;
                                 chaylai:
                                 lanthu++;
+                                //this.Text = this.Text + lanthu;
                                 //Chup anh nut R
                                 Bitmap bmp1 = CaptureHelper.CaptureImage(options.SizeR, options.PointR);
                                 if (options.SaveImg)
                                 {
                                     bmp1.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\R_test1.PNG");
                                 }
-                                if (lanthu > 5)
+                                if (lanthu > options.LanThu)
                                 {
                                     if (!options.ContinueAfterFailed)
                                     {
-                                        if (combo.Combo[0] == KeyDirectX.Decimal)
+                                        if (item == KeyDirectX.NumPadMinus && combo.Combo[0] == KeyDirectX.Decimal)
                                         {
                                             //this.Text = "fail";
-                                            HuyKeyPress(KeyDirectX.Decimal);
+                                            HuyKeyPress(KeyDirectX.Divide);
                                         }
                                         exitLoop = true;
                                     }
                                     if (item == KeyDirectX.NumPadPlus)
                                     {
+                                        //this.Text = "numpadplus";
                                         exitLoop = false;
                                     }
                                     break;
                                 }
                                 if (CompareBitmapsSlow(bmp1, r_Invoker, 95)) { break; }
-                                Thread.Sleep(200);
+                                Thread.Sleep(options.LanThuDelay);
                                 goto chaylai;
                             }
+                            //else if ((combo.Option.ComboName == "code4") && (item == KeyDirectX.F))
+                            //{
+                            //    double x = 0.5 * (current_rect.Left + current_rect.Right);
+                            //    double y = 0.5 * (current_rect.Top + current_rect.Bottom);
+                            //    int n = 36;
+                            //    double goc = 2 * Math.PI / n;
+                            //    int i = 1;
+                            //    // for (int i = 5; i < n; i++)
+                            //    {
+                            //        int cast_x = (int)(x + 200 * Math.Cos(goc * i));
+                            //        int cast_y = (int)(y + 200 * Math.Sin(goc * i));
+                            //        //SetCursorPos(cast_x, cast_y);
+                            //        AutoControl.MouseClick(cast_x, cast_y, EMouseKey.DOUBLE_RIGHT);//cick box ten tai khoan
+                            //        Thread.Sleep(720 / n);
+                            //        AutoControl.MouseClick(cast_x, cast_y, EMouseKey.DOUBLE_RIGHT);//cick box ten tai khoan
+                            //        Thread.Sleep(720 / n);
+                            //        Thread.Sleep(100);
+                            //        HuyKeyPress(KeyDirectX.S);
+                            //        HuyKeyPress(item);
+                            //        Thread.Sleep(200);
+                            //        // i = i + 5;
+                            //    }
+                            //}
                             else
                             {
                                 HuyKeyPress(item);
@@ -733,8 +896,34 @@ namespace WindowsFormsApp1
                 }
                 if (exitLoop) break;
             }
+            endCombo:
             ClipCursor(ref current_rect);
+            //CleaningDecimal();
+
         }
+
+        private Point TinhToanViTri(RECT current_rect, Point rightNow, int offset)
+        {
+            int x = (current_rect.Left + current_rect.Right) / 2;
+            int y = (current_rect.Top + current_rect.Bottom) / 2;
+            double ratioy = 0.5 * (double)rightNow.Y / y;
+            double ratiox = Math.Abs((double)rightNow.X - x) / x;
+            double ratio = -1.2137 * ratioy * ratioy + 1.9655 * ratioy + 0.3558 + 0.2 * ratiox;
+            int vt_x = x - rightNow.X;
+            int vt_y = y - rightNow.Y;
+            double length = Math.Sqrt(vt_x * vt_x + vt_y * vt_y);
+            vt_x = (int)(vt_x * offset * ratio / length);
+            vt_y = (int)(vt_y * offset * ratio / length);
+
+            return new Point(rightNow.X + vt_x, rightNow.Y + vt_y);
+        }
+
+        private void CleaningDecimal()
+        {
+            OnOff = true;
+            this.Text = "Dota";
+        }
+
         public void Combo(string tbCombo)
         {
             foreach (char item in tbCombo.ToLower())

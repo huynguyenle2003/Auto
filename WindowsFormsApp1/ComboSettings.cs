@@ -22,6 +22,7 @@ namespace WindowsFormsApp1
         private string key10;
         private int delayOut;
         private int delayIn;
+        private List<LineTuongBang> l_tuongbang;
 
         public string Key1 { get => key1; set => key1 = value; }
         public string Key2 { get => key2; set => key2 = value; }
@@ -35,10 +36,55 @@ namespace WindowsFormsApp1
         public string Key10 { get => key10; set => key10 = value; }
         public int DelayOut { get => delayOut; set => delayOut = value; }
         public int DelayIn { get => delayIn; set => delayIn = value; }
+        public List<LineTuongBang> L_tuongbang { get => l_tuongbang; set => l_tuongbang = value; }
 
         public ComboSettings()
         {
+            #region khai bao tuong bang
+            L_tuongbang = new List<LineTuongBang>();
 
+            L_tuongbang.Add(new LineTuongBang(0, new Point(130, 300), new Point(209, -390)));
+            L_tuongbang.Add(new LineTuongBang(6, new Point(480, 36), new Point(-353, -352)));
+            L_tuongbang.Add(new LineTuongBang(12, new Point(353, -352), new Point(-455, 66)));
+            L_tuongbang.Add(new LineTuongBang(18, new Point(-190, -447), new Point(-120, -287)));
+            L_tuongbang.Add(new LineTuongBang(24, new Point(-482, -64), new Point(279, 228)));
+            L_tuongbang.Add(new LineTuongBang(30, new Point(-271, 238), new Point(438, -63)));
+
+            L_tuongbang.Add(new LineTuongBang(1, new Point(196, 254), new Point(104, -394)));
+            L_tuongbang.Add(new LineTuongBang(7, new Point(495, -35), new Point(-460, -312)));
+            L_tuongbang.Add(new LineTuongBang(13, new Point(273, -412), new Point(-393, 100)));
+            L_tuongbang.Add(new LineTuongBang(19, new Point(-267, -391), new Point(-47, 305)));
+            L_tuongbang.Add(new LineTuongBang(25, new Point(-453, -3), new Point(299, 184)));
+            L_tuongbang.Add(new LineTuongBang(31, new Point(-232, 270), new Point(456, -128)));
+
+            L_tuongbang.Add(new LineTuongBang(2, new Point(252, 240), new Point(20, -389)));
+            L_tuongbang.Add(new LineTuongBang(8, new Point(484, -118), new Point(-434, -230)));
+            L_tuongbang.Add(new LineTuongBang(14, new Point(148, -397), new Point(-377, 146)));
+            L_tuongbang.Add(new LineTuongBang(20, new Point(-362, -364), new Point(23, 291)));
+            L_tuongbang.Add(new LineTuongBang(26, new Point(-437, 36), new Point(358, 162)));
+            L_tuongbang.Add(new LineTuongBang(32, new Point(-146, 286), new Point(436, -210)));
+
+            L_tuongbang.Add(new LineTuongBang(3, new Point(334, 217), new Point(-66, -412)));
+            L_tuongbang.Add(new LineTuongBang(9, new Point(483, -171), new Point(-457, -171)));
+            L_tuongbang.Add(new LineTuongBang(15, new Point(60, -415), new Point(-305, 223)));
+            L_tuongbang.Add(new LineTuongBang(21, new Point(-468, -342), new Point(105, 293)));
+            L_tuongbang.Add(new LineTuongBang(27, new Point(-422, 111), new Point(422, 111)));
+            L_tuongbang.Add(new LineTuongBang(33, new Point(-85, 305), new Point(432, -300)));
+
+            L_tuongbang.Add(new LineTuongBang(4, new Point(379, 152), new Point(-169, -396)));
+            L_tuongbang.Add(new LineTuongBang(10, new Point(494, -258), new Point(-442, -93)));
+            L_tuongbang.Add(new LineTuongBang(16, new Point(-42, -399), new Point(-260, 235)));
+            L_tuongbang.Add(new LineTuongBang(22, new Point(-502, -245), new Point(139, 265)));
+            L_tuongbang.Add(new LineTuongBang(28, new Point(-384, 148), new Point(405, 53)));
+            L_tuongbang.Add(new LineTuongBang(34, new Point(-29, 318), new Point(349, -364)));
+
+            L_tuongbang.Add(new LineTuongBang(5, new Point(413, 98), new Point(-293, -402)));
+            L_tuongbang.Add(new LineTuongBang(11, new Point(461, -344), new Point(-464, -22)));
+            L_tuongbang.Add(new LineTuongBang(17, new Point(-128, -402), new Point(-202, 300)));
+            L_tuongbang.Add(new LineTuongBang(23, new Point(-520, -168), new Point(201, 242)));
+            L_tuongbang.Add(new LineTuongBang(29, new Point(-351, 203), new Point(418, 2)));
+            L_tuongbang.Add(new LineTuongBang(35, new Point(55, 313), new Point(262, -398)));
+            #endregion
         }
 
         public static KeyDirectX GetKeyDirectXSelect(char item)
@@ -124,9 +170,11 @@ namespace WindowsFormsApp1
                 case '.':
                     return KeyDirectX.Decimal;
                 case '-':
-                    return KeyDirectX.Subtract;
+                    return KeyDirectX.NumPadMinus;
                 case '+':
                     return KeyDirectX.NumPadPlus;
+                case '/':
+                    return KeyDirectX.Divide;
                 default:
                     break;
             }
@@ -218,6 +266,8 @@ namespace WindowsFormsApp1
                     return Keys.Subtract;
                 case '+':
                     return Keys.Add;
+                case '/':
+                    return Keys.OemQuestion;
                 default:
                     break;
             }
@@ -282,12 +332,26 @@ namespace WindowsFormsApp1
                 switch (Option.SpecialHero)
                 {
                     case "Invoker":
-                        if (Option.ComboName==("code1"))
+                        //if (Option.ComboName == ("code1") || Option.ComboName == ("code2") || Option.ComboName == ("code3"))
                         {
                             //List<string> list_cb = new List<string>() { "ew-qq-sff-d-dd-wwer*ftx-eq*x", "-qq-sff-d-dd-wwer*ftx-eq*x" };
                             //List<string> list_cb = new List<string>() { "ew-qq-sew", "-qq-sew" };
-                           
+
                             //foreach (string cb in list_cb)
+                            for (int i = 1; i < list_cb.Length; i++)
+                            {
+                                string cb = list_cb[i];
+                                List<KeyDirectX> temp_combo = new List<KeyDirectX>();
+                                foreach (char item in cb.ToLower())
+                                {
+                                    temp_combo.Add(ComboSettings.GetKeyDirectXSelect(item));
+                                }
+                                L_code_combo.Add(temp_combo);
+                            }
+                        }
+                        break;
+                    case "Tinker-code":
+                        {
                             for (int i = 1; i < list_cb.Length; i++)
                             {
                                 string cb = list_cb[i];
@@ -326,6 +390,10 @@ namespace WindowsFormsApp1
         Size sizeR;
         Point pointD;
         Size sizeD;
+        int lanThu;
+        int lanThuDelay;
+        Point pointF;
+        Size sizeF;
 
         public Point PointQ { get => pointQ; set => pointQ = value; }
         public Size SizeQ { get => sizeQ; set => sizeQ = value; }
@@ -338,6 +406,10 @@ namespace WindowsFormsApp1
         public Size SizeR { get => sizeR; set => sizeR = value; }
         public Point PointD { get => pointD; set => pointD = value; }
         public Size SizeD { get => sizeD; set => sizeD = value; }
+        public int LanThu { get => lanThu; set => lanThu = value; }
+        public int LanThuDelay { get => lanThuDelay; set => lanThuDelay = value; }
+        public Point PointF { get => pointF; set => pointF = value; }
+        public Size SizeF { get => sizeF; set => sizeF = value; }
 
         public ComboOption()
         {
@@ -352,6 +424,10 @@ namespace WindowsFormsApp1
             PointR = new Point(1100, 950);
             SizeD = new Size(15, 15);
             PointD = new Point(1035, 950);
+            LanThu = 5;
+            LanThuDelay = 200;
+            SizeF = new Size(15, 15);
+            PointF = new Point(1015, 950);
         }
     }
     public class ComboKeyOption
@@ -367,6 +443,85 @@ namespace WindowsFormsApp1
         public ComboKeyOption()
         {
             ComboName = "";
+        }
+    }
+    public class LineTuongBang
+    {
+        private int goc_i;
+        private Point start;
+        private Point end;
+
+        public int Goc_i { get => goc_i; set => goc_i = value; }
+        public Point Start { get => start; set => start = value; }
+        public Point End { get => end; set => end = value; }
+        public LineTuongBang(int m_goc_i, Point m_start, Point m_end)
+        {
+            Goc_i = m_goc_i;
+            Start = m_start;
+            End = m_end;
+        }
+        private double TichVoHuong(Point input, Point start, Point end)
+        {
+            double vt_start_x = start.X - input.X;
+            double vt_start_y = start.Y - input.Y;
+            double vt_start_length = Math.Sqrt(vt_start_x * vt_start_x + vt_start_y * vt_start_y);
+            vt_start_x = vt_start_x / vt_start_length;
+            vt_start_y = vt_start_y / vt_start_length;
+
+            double vt_end_x = end.X - input.X;
+            double vt_end_y = end.Y - input.Y;
+            double vt_end_length = Math.Sqrt(vt_end_x * vt_end_x + vt_end_y * vt_end_y);
+            vt_end_x = vt_end_x / vt_end_length;
+            vt_end_y = vt_end_y / vt_end_length;
+
+            double result = vt_start_x * vt_end_x + vt_start_y * vt_end_y;
+            return result;
+        }
+        private double TichVoHuongMoRong(Point input, double heso)
+        {
+            //if (heso==1)
+            //{
+            //    ;
+            //}
+            double center_x = 0.5 * (start.X + end.X);
+            double center_y = 0.5 * (start.Y + end.Y);
+            double vt_start_x = start.X - center_x;
+            double vt_start_y = start.Y - center_y;
+            int new_start_x = (int)(center_x + vt_start_x * heso);
+            int new_start_y = (int)(center_y + vt_start_y * heso);
+            int new_end_x = (int)(center_x - vt_start_x * heso);
+            int new_end_y = (int)(center_y - vt_start_y * heso);
+            return TichVoHuong(input, new Point(new_start_x, new_start_y), new Point(new_end_x, new_end_y));
+        }
+        private double KhoangCachVuongGoc(Point input)
+        {
+            double dientich = 0.5 * Math.Abs((End.X - Start.X) * (input.Y - Start.Y) - (input.X - Start.X) * (End.Y - Start.Y));
+            double x = start.X - end.X;
+            double y = start.Y - end.Y;
+            double length_start_end = Math.Sqrt(x * x + y * y);
+            return dientich / length_start_end;
+        }
+        public bool IsApproval(Point input, out double khoangcach)
+        {
+            double khoangCachChoPhep = 25;
+            double MoRongChoPhep = 1.1;
+            khoangcach = KhoangCachVuongGoc(input);
+            if (khoangcach < khoangCachChoPhep)
+            {
+                if (TichVoHuongMoRong(input, 1) <= 0)
+                {
+                    return true;
+                }
+                else if (TichVoHuongMoRong(input, MoRongChoPhep) <= 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return false;
         }
     }
 }
