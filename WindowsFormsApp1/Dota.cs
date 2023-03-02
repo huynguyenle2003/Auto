@@ -30,6 +30,7 @@ namespace WindowsFormsApp1
         ComboOption options;
         string comboOrder = "";
         DateTime lastUpdateOrder;
+        DateTime sessionEnd;
         Bitmap enemy;
         Bitmap ally;
         Bitmap r_Invoker;
@@ -95,7 +96,7 @@ namespace WindowsFormsApp1
             options = JsonConvert.DeserializeObject<ComboOption>(File.ReadAllText(pathOption));
 
             toogleOnOff = ComboSettings.GetKeySelect(options.OnOff[0]);
-
+            sessionEnd = DateTime.Now;
             //ComboKeyOption testOptions = new ComboKeyOption();
             //File.WriteAllText(pathOption, JsonConvert.SerializeObject(testOptions));
         }
@@ -583,13 +584,31 @@ namespace WindowsFormsApp1
         public void Combo(ComboKey combo)
         {
             Point current = GetCursorPoint();
+            if (combo.Option.SpecialHero == "ChupAnh")
+            {
+                int x = 960;
+                int y = 0;
+                int.TryParse(this.Text, out y);
+
+                if (combo.Keys == Keys.N)
+                {
+                    y += 108;
+                }
+                if (combo.Keys == Keys.P)
+                {
+                    y -= 108;
+                }
+                this.Text = y.ToString();
+                AutoControl.MouseClick(x, y, EMouseKey.DOUBLE_RIGHT);//cick box ten tai khoan
+                return;
+            }
+
             RECT current_rect;
             GetClipCursor(out current_rect);
             if (combo.Option.LockMouseUntilPressThis != KeyDirectX.Nothing || combo.Option.SpecialHero == "Tinker")
             {
                 int offset = 5;
-                RECT rect = new RECT(current.X - offset, current.Y - offset, current.X + offset, current.Y + offset);
-                ClipCursor(ref rect);
+                ClipCursorOffset(current, offset);
             }
             bool exitLoop = false;
             if (combo.L_code_combo.Count > 0)
@@ -642,8 +661,12 @@ namespace WindowsFormsApp1
                         }
                         else if (combo.Option.ComboName == "code4")
                         {
-                            HuyKeyPress(KeyDirectX.S);
-                            this.Text = "Dota";
+                            if ((DateTime.Now - sessionEnd).TotalMilliseconds > 0)
+                            {
+                                goto endCombo;
+                            }
+                            //HuyKeyPress(KeyDirectX.S);
+                            //this.Text = "Dota";
                             //Chup anh nut D,F
                             Bitmap bmp1 = CaptureHelper.CaptureImage(options.SizeD, options.PointD);
                             Bitmap bmp2 = CaptureHelper.CaptureImage(options.SizeF, options.PointF);
@@ -694,24 +717,39 @@ namespace WindowsFormsApp1
                                 //}
                             }
                             //MessageBox.Show(l_gocChon);
-                            //this.Text = current.X.ToString() + "-" + current.Y.ToString() + "_" + goc_chon_i.ToString() + "_" + min_khoangcach.ToString() + "_" + sLThoaKhoangCach.ToString();
                             if (min_khoangcach == 99)
                             {
                                 goto endCombo;
                             }
+                            //this.Text = current.X.ToString() + "-" + current.Y.ToString() + "_" + goc_chon_i.ToString() + "_" + min_khoangcach.ToString() + "_" + sLThoaKhoangCach.ToString();
+                            //this.Text = current.X.ToString() + "-" + current.Y.ToString() + "_" + goc_chon_i.ToString() + "_" + min_khoangcach.ToString();
                             double goc_chon = 2 * goc_chon_i * Math.PI / 36;
                             int cast_x = (int)(x + 200 * Math.Cos(goc_chon));
                             int cast_y = (int)(y + 200 * Math.Sin(goc_chon));
                             SetCursorPos(cast_x, cast_y);
-                            Thread.Sleep(20);
+                            Thread.Sleep(10);
                             AutoControl.MouseClick(cast_x, cast_y, EMouseKey.DOUBLE_RIGHT);//cick box ten tai khoan
-                            Thread.Sleep(100);
+                            Thread.Sleep(10);
                             HuyKeyPress(KeyDirectX.S);
+                            Thread.Sleep(200);
                             HuyKeyPress(keyActive);
-                            Thread.Sleep(100);
                             SetCursorPos(current.X, current.Y);
+                            Thread.Sleep(100);
                             goto endCombo;
-                            boquaclickchuot:;
+                        boquaclickchuot:;
+                        }
+                        else if (combo.Option.ComboName == "code5")
+                        {
+                            Thread.Sleep(200);
+                            ClipCursorOffset(new Point(600, 1000), 1);
+                            AutoControl.MouseClick(600, 1000, EMouseKey.DOUBLE_LEFT);//cick box ten tai khoan
+                            Thread.Sleep(100);
+                            AutoControl.MouseClick(600, 1000, EMouseKey.DOUBLE_LEFT);//cick box ten tai khoan
+                            Thread.Sleep(100);
+                            ClipCursor(ref current_rect);
+                            SetCursorPos(current.X, current.Y);
+                            sessionEnd = DateTime.Now.AddSeconds(15);
+                            goto endCombo;
                         }
                         break;
                     case "Tinker-code":
@@ -757,7 +795,7 @@ namespace WindowsFormsApp1
                                 Thread.Sleep(inner_interval);
                                 ClipCursor(ref current_rect);
                                 int lanthu = 0;
-                                chaylai:
+                            chaylai:
                                 lanthu++;
                                 if (lanthu > 4)
                                 {
@@ -808,7 +846,7 @@ namespace WindowsFormsApp1
                                     //Lấy vị trí chuột hiện tại
                                     Point rightNow = GetCursorPoint();
                                     //Move chuột về vị trí tính toán
-                                    Point tinhToan = TinhToanViTri(current_rect, rightNow, 400);
+                                    Point tinhToan = TinhToanViTri(current_rect, rightNow, 540);
 
                                     SetCursorPos(tinhToan.X, tinhToan.Y);
                                     //Cast 
@@ -826,7 +864,7 @@ namespace WindowsFormsApp1
                             if (item == KeyDirectX.NumPadMinus || item == KeyDirectX.NumPadPlus)
                             {
                                 int lanthu = 0;
-                                chaylai:
+                            chaylai:
                                 lanthu++;
                                 //this.Text = this.Text + lanthu;
                                 //Chup anh nut R
@@ -896,10 +934,16 @@ namespace WindowsFormsApp1
                 }
                 if (exitLoop) break;
             }
-            endCombo:
+        endCombo:
             ClipCursor(ref current_rect);
             //CleaningDecimal();
 
+        }
+
+        private void ClipCursorOffset(Point current, int offset)
+        {
+            RECT rect = new RECT(current.X - offset, current.Y - offset, current.X + offset, current.Y + offset);
+            ClipCursor(ref rect);
         }
 
         private Point TinhToanViTri(RECT current_rect, Point rightNow, int offset)
@@ -908,7 +952,13 @@ namespace WindowsFormsApp1
             int y = (current_rect.Top + current_rect.Bottom) / 2;
             double ratioy = 0.5 * (double)rightNow.Y / y;
             double ratiox = Math.Abs((double)rightNow.X - x) / x;
-            double ratio = -1.2137 * ratioy * ratioy + 1.9655 * ratioy + 0.3558 + 0.2 * ratiox;
+            // double ratio = -1.2137 * ratioy * ratioy + 1.9655 * ratioy + 0.3558 + 0.2 * ratiox;
+            double ratio = 1.4424 * ratioy + 0.2603 + (-0.5 * ratioy + 0.25) * ratiox;
+            if (ratioy > 0.5)
+            {
+                offset = 320;
+                ratio += 0.3 * ratiox;
+            }
             int vt_x = x - rightNow.X;
             int vt_y = y - rightNow.Y;
             double length = Math.Sqrt(vt_x * vt_x + vt_y * vt_y);

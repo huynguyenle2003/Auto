@@ -504,7 +504,7 @@ namespace WindowsFormsApp1
         public bool IsApproval(Point input, out double khoangcach)
         {
             double khoangCachChoPhep = 25;
-            double MoRongChoPhep = 1.1;
+            double MoRongChoPhep = 1.3;
             khoangcach = KhoangCachVuongGoc(input);
             if (khoangcach < khoangCachChoPhep)
             {
