@@ -33,6 +33,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Emgu.CV.World, Version=3.4.1.2976, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dota\Emgu.CV.World.dll</HintPath>
+    </Reference>
     <Reference Include="KAutoHelper">
       <HintPath>..\..\KAutoHelper\bin\Debug\KAutoHelper.dll</HintPath>
     </Reference>

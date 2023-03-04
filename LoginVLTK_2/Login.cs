@@ -1,4 +1,7 @@
-﻿using KAutoHelper;
+﻿using Emgu.CV;
+using Emgu.CV.CvEnum;
+using Emgu.CV.Structure;
+using KAutoHelper;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -234,7 +237,7 @@ namespace LoginVLTK_2
                 Thread.Sleep(500);
             }
             point = null;
-            if (input=="KetNamNhac")
+            if (input == "KetNamNhac")
             {
                 AutoControl.MouseClick(400, 250, EMouseKey.DOUBLE_RIGHT);//tam dung auto
                 Thread.Sleep(1000);
@@ -337,13 +340,13 @@ namespace LoginVLTK_2
             {
                 if (point != null)
                 {
-                   // goto again;
+                    // goto again;
                     AutoControl.MouseClick(290, 360, EMouseKey.LEFT);//click tra nhiem vu
                     Thread.Sleep(500);
                     volam = CaptureHelper.CaptureImage(new Size(820, 640), new Point(0, 0));
                     AutoControl.MouseClick(435, 464, EMouseKey.LEFT);
                 }
-              //  else
+                //  else
                 {
                     point = null;
                     //  volam = CaptureHelper.CaptureImage(new Size(820, 640), new Point(0, 0));
@@ -666,6 +669,37 @@ namespace LoginVLTK_2
             // List<Bitmap> l_anh = new List<Bitmap>();
             //List<Point> test = TinhToanDiemKhaNang(out l_anh);
             // MessageBox.Show(test.Count.ToString());
+        }
+
+        private void bt_Test_Click(object sender, EventArgs e)
+        {
+            //Bitmap manHinh = CaptureHelper.CaptureImage(new Size(1920 / 5, 1080 / 5), new Point(0, 0));
+            Bitmap manHinh = ImageScanOpenCV.GetImage(System.IO.Directory.GetCurrentDirectory() + @"\Dota\Img\cusor_offset_failed.PNG");
+            Bitmap thanhMau = ImageScanOpenCV.GetImage(System.IO.Directory.GetCurrentDirectory() + @"\Dota\Img\KhungThanhMau_Top.png");
+            //double percent = 0;
+            Point? find = FindOutPoint(manHinh, thanhMau);
+            // MessageBox.Show(find.ToString());
+        }
+        public static Point? FindOutPoint(Bitmap mainBitmap, Bitmap subBitmap)
+        {
+            Image<Bgr, byte> arg_17_0 = new Image<Bgr, byte>(mainBitmap);
+            Image<Bgr, byte> template = new Image<Bgr, byte>(subBitmap);
+            Point? result = null;
+            using (Image<Gray, float> image = arg_17_0.MatchTemplate(template, TemplateMatchingType.CcoeffNormed))
+            {
+                image.Save(System.IO.Directory.GetCurrentDirectory() + @"\Dota\Img\Result.png");
+                double[] array;
+                double[] array2;
+                Point[] array3;
+                Point[] array4;
+
+                image.MinMax(out array, out array2, out array3, out array4);
+                if (array2[0] == 1)
+                {
+                    result = new Point?(array4[0]);
+                }
+            }
+            return result;
         }
     }
 }

@@ -36,6 +36,7 @@ namespace LoginVLTK_2
             this.btTraNhiemVu = new System.Windows.Forms.Button();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.bt_Test = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // tbUser
@@ -83,11 +84,22 @@ namespace LoginVLTK_2
             this.timer1.Interval = 1000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
+            // bt_Test
+            // 
+            this.bt_Test.Location = new System.Drawing.Point(105, 75);
+            this.bt_Test.Name = "bt_Test";
+            this.bt_Test.Size = new System.Drawing.Size(59, 20);
+            this.bt_Test.TabIndex = 4;
+            this.bt_Test.Text = "Find";
+            this.bt_Test.UseVisualStyleBackColor = true;
+            this.bt_Test.Click += new System.EventHandler(this.bt_Test_Click);
+            // 
             // frm_login
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(286, 69);
+            this.ClientSize = new System.Drawing.Size(286, 118);
+            this.Controls.Add(this.bt_Test);
             this.Controls.Add(this.btTraNhiemVu);
             this.Controls.Add(this.btLogin);
             this.Controls.Add(this.tbPassword);
@@ -109,6 +121,7 @@ namespace LoginVLTK_2
         private System.Windows.Forms.Button btTraNhiemVu;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Button bt_Test;
     }
 }
 

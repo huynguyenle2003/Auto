@@ -1,4 +1,7 @@
-﻿using Gma.UserActivityMonitor;
+﻿using Emgu.CV;
+using Emgu.CV.CvEnum;
+using Emgu.CV.Structure;
+using Gma.UserActivityMonitor;
 using KAutoHelper;
 using Newtonsoft.Json;
 using System;
@@ -60,6 +63,8 @@ namespace WindowsFormsApp1
         static extern bool GetClipCursor(out RECT lpRect);
         [DllImport("User32.Dll")]
         public static extern long SetCursorPos(int x, int y);
+        [DllImport("User32.Dll")]
+        public static extern int ShowCursor(bool show);
         private void Dota_Load(object sender, EventArgs e)
         {
             #region Load Image Constrain
@@ -576,6 +581,41 @@ namespace WindowsFormsApp1
                     return !CompareBitmapsFast(ally, GetCursorBitmap());
                 case "notEnemy":
                     return !CompareBitmapsFast(enemy, GetCursorBitmap());
+                case "findEnemy":
+                    if (CompareBitmapsFast(enemy, GetCursorBitmap()))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        Point current = GetCursorPoint();
+                        int offset = 200;
+                        Point offset_point = new Point(current.X - offset, current.Y - offset);
+                        Bitmap manHinh = CaptureHelper.CaptureImage(new Size(2 * offset, 2 * offset), offset_point);
+                        if (options.SaveImg)
+                        {
+                            manHinh.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\cusor_offset.PNG");
+                        }
+                        //Bitmap manHinh = CaptureHelper.CaptureImage(new Size(1920 / 5, 1080 / 5), new Point(0, 0));
+                        Bitmap thanhMau = ImageScanOpenCV.GetImage(System.IO.Directory.GetCurrentDirectory() + @"\Img\KhungThanhMau_Top.png");
+                        Point? finded = FindOutPoint(manHinh, thanhMau);
+                        if (finded.HasValue)
+                        {
+
+                            int width_mh = 1920;
+                            int cast_x = 100 - 100 * current.X / width_mh;
+                            //this.Text += cast_x.ToString() + ";";
+                            Point enemyPosition = new Point(offset_point.X + finded.Value.X + cast_x, offset_point.Y + finded.Value.Y + 70);
+                            //Clipboard.SetText(Clipboard.GetText() + finded.Value.X.ToString() + "-" + finded.Value.Y.ToString() + "_" + enemyPosition.X.ToString() + "-" + enemyPosition.Y.ToString() + "; ");
+                            SetCursorPos(enemyPosition.X, enemyPosition.Y);
+                            return true;
+                        }
+                        else
+                        {
+                            manHinh.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\cusor_offset_failed.PNG");
+                            return false;
+                        }
+                    }
                 default:
                     return true;
             }
@@ -583,10 +623,11 @@ namespace WindowsFormsApp1
         //public void Combo(List<KeyDirectX> tbCombo)
         public void Combo(ComboKey combo)
         {
+            DateTime start_combo = DateTime.Now;
             Point current = GetCursorPoint();
             if (combo.Option.SpecialHero == "ChupAnh")
             {
-                int x = 960;
+                int x = 192;
                 int y = 0;
                 int.TryParse(this.Text, out y);
 
@@ -661,11 +702,12 @@ namespace WindowsFormsApp1
                         }
                         else if (combo.Option.ComboName == "code4")
                         {
+                            AutoControl.MouseClick(current.X, current.Y, EMouseKey.DOUBLE_RIGHT);//cick box ten tai khoan
+                            HuyKeyPress(KeyDirectX.S);
                             if ((DateTime.Now - sessionEnd).TotalMilliseconds > 0)
                             {
                                 goto endCombo;
                             }
-                            //HuyKeyPress(KeyDirectX.S);
                             //this.Text = "Dota";
                             //Chup anh nut D,F
                             Bitmap bmp1 = CaptureHelper.CaptureImage(options.SizeD, options.PointD);
@@ -696,6 +738,10 @@ namespace WindowsFormsApp1
                             int goc_chon_i = 0;
                             double min_khoangcach = 99;
                             Point current_relate = new Point(current.X - x, y - current.Y);
+                            if (current_relate.Y < 0)
+                            {
+                                current_relate = new Point(current.X - x, y - current.Y - 40);
+                            }
                             //int sLThoaKhoangCach = 0;
                             //string l_gocChon = "";
                             foreach (LineTuongBang item in user.L_tuongbang)
@@ -729,26 +775,50 @@ namespace WindowsFormsApp1
                             SetCursorPos(cast_x, cast_y);
                             Thread.Sleep(10);
                             AutoControl.MouseClick(cast_x, cast_y, EMouseKey.DOUBLE_RIGHT);//cick box ten tai khoan
-                            Thread.Sleep(10);
                             HuyKeyPress(KeyDirectX.S);
-                            Thread.Sleep(200);
+                            Thread.Sleep(20);
+                            AutoControl.MouseClick(cast_x, cast_y, EMouseKey.DOUBLE_RIGHT);//cick box ten tai khoan
+                            HuyKeyPress(KeyDirectX.S);
+                            Thread.Sleep(20);
+                            AutoControl.MouseClick(cast_x, cast_y, EMouseKey.DOUBLE_RIGHT);//cick box ten tai khoan
+                            HuyKeyPress(KeyDirectX.S);
+                            Thread.Sleep(20);
+
+                            //HuyKeyPress(KeyDirectX.S);
+                            //HuyKeyPress(KeyDirectX.S);
+                            //HuyKeyPress(KeyDirectX.S);
+                            //Thread.Sleep(200);
+                            //for (int i = 0; i < 5; i++)
+                            //{
+                            //    Thread.Sleep(1 + 20 * i);
+                            //    HuyKeyPress(KeyDirectX.S);
+                            //}
+                            //Thread.Sleep(250);
                             HuyKeyPress(keyActive);
                             SetCursorPos(current.X, current.Y);
-                            Thread.Sleep(100);
+                            //Thread.Sleep(150);
+                            //HuyKeyPress(KeyDirectX.S);
+
                             goto endCombo;
-                        boquaclickchuot:;
+                            boquaclickchuot:;
                         }
                         else if (combo.Option.ComboName == "code5")
                         {
-                            Thread.Sleep(200);
-                            ClipCursorOffset(new Point(600, 1000), 1);
-                            AutoControl.MouseClick(600, 1000, EMouseKey.DOUBLE_LEFT);//cick box ten tai khoan
-                            Thread.Sleep(100);
-                            AutoControl.MouseClick(600, 1000, EMouseKey.DOUBLE_LEFT);//cick box ten tai khoan
-                            Thread.Sleep(100);
-                            ClipCursor(ref current_rect);
+                            //Thread.Sleep(200);
+                            //ShowCursor(false);
+                            //ClipCursorOffset(new Point(550, 970), 1);
+
+                            AutoControl.MouseClick(550, 970, EMouseKey.DOUBLE_LEFT);//cick box ten tai khoan
+                            Thread.Sleep(20);
+                            AutoControl.MouseClick(550, 970, EMouseKey.DOUBLE_LEFT);//cick box ten tai khoan
+                            Thread.Sleep(20);
+                            AutoControl.MouseClick(550, 970, EMouseKey.DOUBLE_LEFT);//cick box ten tai khoan
+                            Thread.Sleep(20);
+                            //ClipCursor(ref current_rect);
                             SetCursorPos(current.X, current.Y);
                             sessionEnd = DateTime.Now.AddSeconds(15);
+                            //Thread.Sleep(2000);
+                            //ShowCursor(true);
                             goto endCombo;
                         }
                         break;
@@ -761,6 +831,10 @@ namespace WindowsFormsApp1
                     default:
                         break;
                 }
+            }
+            if (combo.Option.CallWithMouse == "findEmeny")
+            {
+                ClipCursor(ref current_rect);
             }
             foreach (KeyDirectX item in combo.Combo)
             {
@@ -776,6 +850,7 @@ namespace WindowsFormsApp1
                         case "Tinker":
                             if (item == KeyDirectX.Q)
                             {
+
                                 //Chup anh nut Q
                                 Bitmap bmp1 = CaptureHelper.CaptureImage(options.SizeQ, options.PointQ);
                                 // Bitmap bmp1 = new Bitmap(System.IO.Directory.GetCurrentDirectory() + @"\Img\Q_test1_1.PNG");
@@ -784,6 +859,7 @@ namespace WindowsFormsApp1
                                     bmp1.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\Q_test1.PNG");
                                 }
                                 //Bam Q
+                                chaylai:
                                 if (!IsCorrectCursor(combo))
                                 {
                                     ClipCursor(ref current_rect);
@@ -794,10 +870,11 @@ namespace WindowsFormsApp1
                                 //Check anh nut Q
                                 Thread.Sleep(inner_interval);
                                 ClipCursor(ref current_rect);
-                                int lanthu = 0;
-                            chaylai:
-                                lanthu++;
-                                if (lanthu > 4)
+                                //int lanthu = 0;
+                                //    chaylai:
+                                //lanthu++;
+                                //   if (lanthu > 4)
+                                if ((DateTime.Now - start_combo).Seconds > 5)
                                 {
                                     if (!options.ContinueAfterFailed)
                                     {
@@ -835,6 +912,10 @@ namespace WindowsFormsApp1
                             }
                             else
                             {
+                                if ((combo.Option.CallWithMouse == "findEmeny"))
+                                {
+                                    IsCorrectCursor(combo);//try focus Enemy
+                                }
                                 HuyKeyPress(item);
                             }
                             break;
@@ -846,8 +927,11 @@ namespace WindowsFormsApp1
                                     //Lấy vị trí chuột hiện tại
                                     Point rightNow = GetCursorPoint();
                                     //Move chuột về vị trí tính toán
-                                    Point tinhToan = TinhToanViTri(current_rect, rightNow, 540);
+                                    // double length = 0;
+                                    Point tinhToan = TinhToanViTri(current_rect, rightNow, 650);
 
+                                    //this.Text = rightNow.X + "," + rightNow.Y + "_" + tinhToan.X + "," + tinhToan.Y + "_" + length.ToString();
+                                    //Clipboard.SetText(rightNow.X + "," + rightNow.Y + "_" + tinhToan.X + "," + tinhToan.Y);
                                     SetCursorPos(tinhToan.X, tinhToan.Y);
                                     //Cast 
                                     Thread.Sleep(50);
@@ -864,7 +948,7 @@ namespace WindowsFormsApp1
                             if (item == KeyDirectX.NumPadMinus || item == KeyDirectX.NumPadPlus)
                             {
                                 int lanthu = 0;
-                            chaylai:
+                                chaylai:
                                 lanthu++;
                                 //this.Text = this.Text + lanthu;
                                 //Chup anh nut R
@@ -934,7 +1018,7 @@ namespace WindowsFormsApp1
                 }
                 if (exitLoop) break;
             }
-        endCombo:
+            endCombo:
             ClipCursor(ref current_rect);
             //CleaningDecimal();
 
@@ -946,28 +1030,54 @@ namespace WindowsFormsApp1
             ClipCursor(ref rect);
         }
 
-        private Point TinhToanViTri(RECT current_rect, Point rightNow, int offset)
+        private Point TinhToanViTri(RECT current_rect, Point rightNow, int tamdanh)
         {
+            int rawlength = 650;
             int x = (current_rect.Left + current_rect.Right) / 2;
             int y = (current_rect.Top + current_rect.Bottom) / 2;
             double ratioy = 0.5 * (double)rightNow.Y / y;
-            double ratiox = Math.Abs((double)rightNow.X - x) / x;
+            if (ratioy < 0.5)
+            {
+                rightNow = new Point(rightNow.X, rightNow.Y + 40);
+                ratioy = 0.5 * (double)rightNow.Y / y;
+            }
+            double ratiox = -Math.Abs((double)rightNow.X - x) / x;
             // double ratio = -1.2137 * ratioy * ratioy + 1.9655 * ratioy + 0.3558 + 0.2 * ratiox;
-            double ratio = 1.4424 * ratioy + 0.2603 + (-0.5 * ratioy + 0.25) * ratiox;
+            //double ratio = 1.4424 * ratioy + 0.2603 + (-0.5 * ratioy + 0.25) * ratiox;
+            double length = 791.42 * ratioy + 139.72 + (ratiox / 0.9) * (398.43 * ratioy * ratioy - 13.328 * ratioy - 0.7575);
             if (ratioy > 0.5)
             {
-                offset = 320;
-                ratio += 0.3 * ratiox;
+                length = 461.35 * ratioy + 85.013 + (ratiox / 0.9) * (754.89 * ratioy * ratioy - 951.91 * ratioy + 157.91);
             }
             int vt_x = x - rightNow.X;
             int vt_y = y - rightNow.Y;
-            double length = Math.Sqrt(vt_x * vt_x + vt_y * vt_y);
-            vt_x = (int)(vt_x * offset * ratio / length);
-            vt_y = (int)(vt_y * offset * ratio / length);
+            double vt_length = Math.Sqrt(vt_x * vt_x + vt_y * vt_y) * tamdanh / rawlength;
+            vt_x = (int)(vt_x * length / vt_length);
+            vt_y = (int)(vt_y * length / vt_length);
 
             return new Point(rightNow.X + vt_x, rightNow.Y + vt_y);
         }
+        public static Point? FindOutPoint(Bitmap mainBitmap, Bitmap subBitmap)
+        {
+            Image<Bgr, byte> arg_17_0 = new Image<Bgr, byte>(mainBitmap);
+            Image<Bgr, byte> template = new Image<Bgr, byte>(subBitmap);
+            Point? result = null;
+            using (Image<Gray, float> image = arg_17_0.MatchTemplate(template, TemplateMatchingType.CcoeffNormed))
+            {
+                // image.Save(@"C:\Users\HP\Desktop\tool\HP check\Result.png");
+                double[] array;
+                double[] array2;
+                Point[] array3;
+                Point[] array4;
 
+                image.MinMax(out array, out array2, out array3, out array4);
+                if (array2[0] >= 0.9999)
+                {
+                    result = new Point?(array4[0]);
+                }
+            }
+            return result;
+        }
         private void CleaningDecimal()
         {
             OnOff = true;
