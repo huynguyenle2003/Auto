@@ -588,36 +588,67 @@ namespace WindowsFormsApp1
                     }
                     else
                     {
-                        Point current = GetCursorPoint();
-                        int offset = 200;
-                        Point offset_point = new Point(current.X - offset, current.Y - offset);
-                        Bitmap manHinh = CaptureHelper.CaptureImage(new Size(2 * offset, 2 * offset), offset_point);
-                        if (options.SaveImg)
-                        {
-                            manHinh.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\cusor_offset.PNG");
-                        }
-                        //Bitmap manHinh = CaptureHelper.CaptureImage(new Size(1920 / 5, 1080 / 5), new Point(0, 0));
-                        Bitmap thanhMau = ImageScanOpenCV.GetImage(System.IO.Directory.GetCurrentDirectory() + @"\Img\KhungThanhMau_Top.png");
-                        Point? finded = FindOutPoint(manHinh, thanhMau);
-                        if (finded.HasValue)
-                        {
+                        return TryGetEnemyPosition(200, 300);
+                        //Point current = GetCursorPoint();
+                        //int offset = 200;
+                        //Point offset_point = new Point(current.X - offset, current.Y - offset);
+                        //Bitmap manHinh = CaptureHelper.CaptureImage(new Size(2 * offset, 2 * offset), offset_point);
+                        //if (options.SaveImg)
+                        //{
+                        //    manHinh.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\cusor_offset.PNG");
+                        //}
+                        ////Bitmap manHinh = CaptureHelper.CaptureImage(new Size(1920 / 5, 1080 / 5), new Point(0, 0));
+                        //Bitmap thanhMau = ImageScanOpenCV.GetImage(System.IO.Directory.GetCurrentDirectory() + @"\Img\KhungThanhMau_Top.png");
+                        //Point? finded = FindOutPoint(manHinh, thanhMau);
+                        //if (finded.HasValue)
+                        //{
 
-                            int width_mh = 1920;
-                            int cast_x = 100 - 100 * current.X / width_mh;
-                            //this.Text += cast_x.ToString() + ";";
-                            Point enemyPosition = new Point(offset_point.X + finded.Value.X + cast_x, offset_point.Y + finded.Value.Y + 70);
-                            //Clipboard.SetText(Clipboard.GetText() + finded.Value.X.ToString() + "-" + finded.Value.Y.ToString() + "_" + enemyPosition.X.ToString() + "-" + enemyPosition.Y.ToString() + "; ");
-                            SetCursorPos(enemyPosition.X, enemyPosition.Y);
-                            return true;
-                        }
-                        else
-                        {
-                            manHinh.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\cusor_offset_failed.PNG");
-                            return false;
-                        }
+                        //    int width_mh = 1920;
+                        //    int cast_x = 100 - 100 * current.X / width_mh;
+                        //    //this.Text += cast_x.ToString() + ";";
+                        //    Point enemyPosition = new Point(offset_point.X + finded.Value.X + cast_x, offset_point.Y + finded.Value.Y + 70);
+                        //    //Clipboard.SetText(Clipboard.GetText() + finded.Value.X.ToString() + "-" + finded.Value.Y.ToString() + "_" + enemyPosition.X.ToString() + "-" + enemyPosition.Y.ToString() + "; ");
+                        //    SetCursorPos(enemyPosition.X, enemyPosition.Y);
+                        //    return true;
+                        //}
+                        //else
+                        //{
+                        //    manHinh.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\cusor_offset_failed.PNG");
+                        //    return false;
+                        //}
                     }
                 default:
                     return true;
+            }
+        }
+        public bool TryGetEnemyPosition(int offset_X, int offset_Y)
+        {
+            Point current = GetCursorPoint();
+            //int offset = 200;
+            Point offset_point = new Point(current.X - offset_X, current.Y - offset_Y);
+            Bitmap manHinh = CaptureHelper.CaptureImage(new Size(2 * offset_X, 2 * offset_Y), offset_point);
+            if (options.SaveImg)
+            {
+                manHinh.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\cusor_offset.PNG");
+            }
+            //Bitmap manHinh = CaptureHelper.CaptureImage(new Size(1920 / 5, 1080 / 5), new Point(0, 0));
+            Bitmap thanhMau = ImageScanOpenCV.GetImage(System.IO.Directory.GetCurrentDirectory() + @"\Img\KhungThanhMau_Top.png");
+            Point? finded = FindOutPoint(manHinh, thanhMau);
+            if (finded.HasValue)
+            {
+
+                int width_mh = 1920;
+                int cast_x = 100 - 100 * current.X / width_mh;
+                //this.Text += cast_x.ToString() + ";";
+                Point enemyPosition = new Point(offset_point.X + finded.Value.X + cast_x, offset_point.Y + finded.Value.Y + 70);
+                //Clipboard.SetText(Clipboard.GetText() + finded.Value.X.ToString() + "-" + finded.Value.Y.ToString() + "_" + enemyPosition.X.ToString() + "-" + enemyPosition.Y.ToString() + "; ");
+                SetCursorPos(enemyPosition.X, enemyPosition.Y);
+                return true;
+            }
+            else
+            {
+                manHinh.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\cusor_offset_failed.PNG");
+                return false;
             }
         }
         //public void Combo(List<KeyDirectX> tbCombo)
@@ -702,12 +733,30 @@ namespace WindowsFormsApp1
                         }
                         else if (combo.Option.ComboName == "code4")
                         {
+                            Point origin_current = new Point(current.X, current.Y);
+                            HuyKeyPress(KeyDirectX.S);
+                            int x = (int)(0.5 * (current_rect.Left + current_rect.Right));
+                            int y = (int)(0.5 * (current_rect.Top + current_rect.Bottom));
+                            if (current.X == x && current.Y == y)
+                            {
+                                TryGetEnemyPosition(600, 450);
+                                current = GetCursorPoint();
+                            }
+                            else
+                            {
+                                TryGetEnemyPosition(200, 200);
+                                current = GetCursorPoint();
+                            }
                             AutoControl.MouseClick(current.X, current.Y, EMouseKey.DOUBLE_RIGHT);//cick box ten tai khoan
                             HuyKeyPress(KeyDirectX.S);
-                            if ((DateTime.Now - sessionEnd).TotalMilliseconds > 0)
-                            {
-                                goto endCombo;
-                            }
+                            //Thoi gian cho quay ve huong enemy
+                            //Thread.Sleep(300);
+
+                            //if ((DateTime.Now - sessionEnd).TotalMilliseconds > 0)
+                            //{
+                            //    goto endCombo;
+                            //}
+
                             //this.Text = "Dota";
                             //Chup anh nut D,F
                             Bitmap bmp1 = CaptureHelper.CaptureImage(options.SizeD, options.PointD);
@@ -718,30 +767,59 @@ namespace WindowsFormsApp1
                                 bmp2.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\F_test1.PNG");
                             }
                             KeyDirectX keyActive = KeyDirectX.Nothing;
+                            KeyDirectX keySecond = KeyDirectX.Nothing;
+                            bool secondIsThaiDuong = false;
                             if (CompareBitmapsSlow(bmp1, Invoker_TuongBang_ChuaDung, 95))
                             {
                                 keyActive = KeyDirectX.D;
+                                if (CompareBitmapsSlow(bmp2, Invoker_MiniStun_ChuaDung, 95))
+                                {
+                                    keySecond = KeyDirectX.F;
+                                }
+                                else if (CompareBitmapsSlow(bmp2, Invoker_ThaiDuong_ChuaDung, 95))
+                                {
+                                    keySecond = KeyDirectX.F;
+                                    secondIsThaiDuong = true;
+                                }
                             }
-                            else if (CompareBitmapsSlow(bmp2, Invoker_TuongBang_ChuaDung, 95))
+                            else if ((CompareBitmapsSlow(bmp2, Invoker_TuongBang_ChuaDung, 95)))
                             {
                                 keyActive = KeyDirectX.F;
+                                if (CompareBitmapsSlow(bmp1, Invoker_MiniStun_ChuaDung, 95))
+                                {
+                                    keySecond = KeyDirectX.D;
+                                }
+                                else if (CompareBitmapsSlow(bmp1, Invoker_ThaiDuong_ChuaDung, 95))
+                                {
+                                    keySecond = KeyDirectX.D;
+                                    secondIsThaiDuong = true;
+                                }
                             }
                             else
                             {
                                 combo.Combo = combo.L_code_combo[0];
                                 goto boquaclickchuot;
                             }
+                            if (keySecond != KeyDirectX.Nothing)
+                            {
+                                if (secondIsThaiDuong)
+                                {
+                                    SetCursorPos(origin_current.X, origin_current.Y);
+                                }
+                                HuyKeyPress(keySecond);
+                                Thread.Sleep(200);
+                                TryGetEnemyPosition(200, 200);
+                                current = GetCursorPoint();
+                            }
 
-                            int x = (int)(0.5 * (current_rect.Left + current_rect.Right));
-                            int y = (int)(0.5 * (current_rect.Top + current_rect.Bottom));
 
                             int goc_chon_i = 0;
                             double min_khoangcach = 99;
-                            Point current_relate = new Point(current.X - x, y - current.Y);
-                            if (current_relate.Y < 0)
-                            {
-                                current_relate = new Point(current.X - x, y - current.Y - 40);
-                            }
+                            Point current_relate = new Point(current.X - x, y - current.Y - 40);
+                            //if (current_relate.Y < 0)
+                            //{
+                            //    current_relate = new Point(current.X - x, y - current.Y - 40);
+                            //}
                             //int sLThoaKhoangCach = 0;
                             //string l_gocChon = "";
                             foreach (LineTuongBang item in user.L_tuongbang)
@@ -772,6 +850,12 @@ namespace WindowsFormsApp1
                             double goc_chon = 2 * goc_chon_i * Math.PI / 36;
                             int cast_x = (int)(x + 200 * Math.Cos(goc_chon));
                             int cast_y = (int)(y + 200 * Math.Sin(goc_chon));
+                            //int goc = ((int)(Math.Acos(LineTuongBang.TichVoHuong(new Point(x, y), new Point(cast_x, cast_y), current)) * 180 / Math.PI));
+                            //if (goc > 180)
+                            //{
+                            //    goc = 360 - goc;
+                            //}
+                            //this.Text = goc.ToString() + ": " + x.ToString() + "," + y.ToString() + "---" + current.X.ToString() + "," + current.Y.ToString() + "---" + cast_x.ToString() + "," + cast_y.ToString();
                             SetCursorPos(cast_x, cast_y);
                             Thread.Sleep(10);
                             AutoControl.MouseClick(cast_x, cast_y, EMouseKey.DOUBLE_RIGHT);//cick box ten tai khoan
@@ -798,9 +882,20 @@ namespace WindowsFormsApp1
                             SetCursorPos(current.X, current.Y);
                             //Thread.Sleep(150);
                             //HuyKeyPress(KeyDirectX.S);
-
+                            if (keySecond != KeyDirectX.Nothing)
+                            {
+                                Thread.Sleep(100);
+                                if (secondIsThaiDuong)
+                                {
+                                    //TryGetEnemyPosition(200, 200);
+                                    HuyKeyPress(KeyDirectX.Q);
+                                    Thread.Sleep(20);
+                                    HuyKeyPress(KeyDirectX.Q);
+                                    Thread.Sleep(20);
+                                }
+                            }
                             goto endCombo;
-                            boquaclickchuot:;
+                        boquaclickchuot:;
                         }
                         else if (combo.Option.ComboName == "code5")
                         {
@@ -815,10 +910,30 @@ namespace WindowsFormsApp1
                             AutoControl.MouseClick(550, 970, EMouseKey.DOUBLE_LEFT);//cick box ten tai khoan
                             Thread.Sleep(20);
                             //ClipCursor(ref current_rect);
-                            SetCursorPos(current.X, current.Y);
-                            sessionEnd = DateTime.Now.AddSeconds(15);
+                            sessionEnd = DateTime.Now.AddSeconds(10);
                             //Thread.Sleep(2000);
                             //ShowCursor(true);
+
+                            //SetCursorPos(current.X, current.Y);
+                            int x = (int)(0.5 * (current_rect.Left + current_rect.Right));
+                            int y = (int)(0.5 * (current_rect.Top + current_rect.Bottom));
+                            SetCursorPos(x, y);
+                            foreach (ComboKey comboKey in l_keymulti)
+                            {
+                                if (comboKey.Option.ComboName == "code4")
+                                {
+                                    if ((DateTime.Now - comboKey.LastCall).TotalMilliseconds > delayBetweenCombos)
+                                    {
+                                        if (IsCorrectCursor(comboKey))
+                                        {
+                                            comboKey.LastCall = DateTime.Now;
+                                            Combo(comboKey);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
                             goto endCombo;
                         }
                         break;
@@ -858,8 +973,8 @@ namespace WindowsFormsApp1
                                 {
                                     bmp1.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\Q_test1.PNG");
                                 }
-                                //Bam Q
-                                chaylai:
+                            //Bam Q
+                            chaylai:
                                 if (!IsCorrectCursor(combo))
                                 {
                                     ClipCursor(ref current_rect);
@@ -948,7 +1063,7 @@ namespace WindowsFormsApp1
                             if (item == KeyDirectX.NumPadMinus || item == KeyDirectX.NumPadPlus)
                             {
                                 int lanthu = 0;
-                                chaylai:
+                            chaylai:
                                 lanthu++;
                                 //this.Text = this.Text + lanthu;
                                 //Chup anh nut R
@@ -979,29 +1094,6 @@ namespace WindowsFormsApp1
                                 Thread.Sleep(options.LanThuDelay);
                                 goto chaylai;
                             }
-                            //else if ((combo.Option.ComboName == "code4") && (item == KeyDirectX.F))
-                            //{
-                            //    double x = 0.5 * (current_rect.Left + current_rect.Right);
-                            //    double y = 0.5 * (current_rect.Top + current_rect.Bottom);
-                            //    int n = 36;
-                            //    double goc = 2 * Math.PI / n;
-                            //    int i = 1;
-                            //    // for (int i = 5; i < n; i++)
-                            //    {
-                            //        int cast_x = (int)(x + 200 * Math.Cos(goc * i));
-                            //        int cast_y = (int)(y + 200 * Math.Sin(goc * i));
-                            //        //SetCursorPos(cast_x, cast_y);
-                            //        AutoControl.MouseClick(cast_x, cast_y, EMouseKey.DOUBLE_RIGHT);//cick box ten tai khoan
-                            //        Thread.Sleep(720 / n);
-                            //        AutoControl.MouseClick(cast_x, cast_y, EMouseKey.DOUBLE_RIGHT);//cick box ten tai khoan
-                            //        Thread.Sleep(720 / n);
-                            //        Thread.Sleep(100);
-                            //        HuyKeyPress(KeyDirectX.S);
-                            //        HuyKeyPress(item);
-                            //        Thread.Sleep(200);
-                            //        // i = i + 5;
-                            //    }
-                            //}
                             else
                             {
                                 HuyKeyPress(item);
@@ -1018,7 +1110,7 @@ namespace WindowsFormsApp1
                 }
                 if (exitLoop) break;
             }
-            endCombo:
+        endCombo:
             ClipCursor(ref current_rect);
             //CleaningDecimal();
 

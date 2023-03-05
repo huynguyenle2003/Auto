@@ -460,7 +460,7 @@ namespace WindowsFormsApp1
             Start = m_start;
             End = m_end;
         }
-        private double TichVoHuong(Point input, Point start, Point end)
+        public static double TichVoHuong(Point input, Point start, Point end)
         {
             double vt_start_x = start.X - input.X;
             double vt_start_y = start.Y - input.Y;
