@@ -49,6 +49,9 @@ namespace WindowsFormsApp1
         bool runHandler = true;
         Keys toogleOnOff;
         bool OnOff = true;
+        //bool stopImmediate = false;
+        CancellationTokenSource cancelCombo;
+        CancellationToken cancelToken;
         public Dota()
         {
             InitializeComponent();
@@ -65,6 +68,8 @@ namespace WindowsFormsApp1
         public static extern long SetCursorPos(int x, int y);
         [DllImport("User32.Dll")]
         public static extern int ShowCursor(bool show);
+        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true, CallingConvention = CallingConvention.Winapi)]
+        public static extern short GetKeyState(int keyCode);
         private void Dota_Load(object sender, EventArgs e)
         {
             #region Load Image Constrain
@@ -76,6 +81,9 @@ namespace WindowsFormsApp1
             Invoker_TuongBang_ChuaDung = LoadBitMapRBG(System.IO.Directory.GetCurrentDirectory() + @"\Img\Invoker\Invoker_TuongBang_ChuaDung.PNG");
             Invoker_ThaiDuong_ChuaDung = LoadBitMapRBG(System.IO.Directory.GetCurrentDirectory() + @"\Img\Invoker\Invoker_ThaiDuong_ChuaDung.PNG");
             #endregion
+            //bool CapsLock = (((ushort)GetKeyState(0x14)) & 0xffff) != 0;
+            //bool NumLock = (((ushort)GetKeyState(0x90)) & 0xffff) != 0;
+            //bool ScrollLock = (((ushort)GetKeyState(0x91)) & 0xffff) != 0;
             keyConvert = new KeysConverter();
             nudTimeSpanIn.Controls.RemoveAt(0);
             nudTimeSpanOut.Controls.RemoveAt(0);
@@ -85,7 +93,7 @@ namespace WindowsFormsApp1
             span_interval = TimeSpan.FromMilliseconds(interval);
             //HookManager.KeyPress += HookManager_KeyPress;
             HookManager.KeyDown += HookManager_KeyDown;
-            // HookManager.KeyUp += HookManager_KeyUp;
+            HookManager.KeyUp += HookManager_KeyUp;
 
             string[] arr_origin = File.ReadAllLines(pathSave);
             foreach (string item in arr_origin)
@@ -102,10 +110,12 @@ namespace WindowsFormsApp1
 
             toogleOnOff = ComboSettings.GetKeySelect(options.OnOff[0]);
             sessionEnd = DateTime.Now;
+
+            //stopImmediate = false;
+            cancelCombo = new CancellationTokenSource();
             //ComboKeyOption testOptions = new ComboKeyOption();
             //File.WriteAllText(pathOption, JsonConvert.SerializeObject(testOptions));
         }
-
         private Bitmap LoadBitMapRBG(string v)
         {
             Bitmap bmp = new Bitmap(v);
@@ -389,7 +399,7 @@ namespace WindowsFormsApp1
         {
             throw new NotImplementedException();
         }
-        private void HookManager_KeyDown(object sender, KeyEventArgs e)
+        private async void HookManager_KeyDown(object sender, KeyEventArgs e)
         {
             //DateTime start = DateTime.Now;
             //MessageBox.Show(e.KeyCode.ToString());
@@ -412,10 +422,6 @@ namespace WindowsFormsApp1
                 OnOff = true;
                 return;
             }
-            //else
-            //{
-            //    this.Text += e.KeyCode.ToString();
-            //}
             if (!OnOff)
             {
                 return;
@@ -430,9 +436,38 @@ namespace WindowsFormsApp1
                     {
                         if (IsCorrectCursor(comboKey))
                         {
+                            //comboKey.LastCall = DateTime.Now;
+                            //stopImmediate = false;
+                            //Combo(comboKey, DateTime.Now);
+                            //if (stopImmediate)
+                            //{
+                            //    comboKey.LastCall = DateTime.MinValue;
+                            //}
+                            cancelCombo = new CancellationTokenSource();
                             comboKey.LastCall = DateTime.Now;
-                            //await Combo(comboKey.Combo);
-                            Combo(comboKey);
+                            cancelToken = cancelCombo.Token;
+                            Action actCombo = () =>
+                            {
+                                Combo(comboKey, DateTime.Now);
+                            };
+                            try
+                            {
+                                await Task.Run(actCombo);
+                                if (cancelToken.IsCancellationRequested)
+                                {
+                                    // this.Text = "Stoped Action";
+                                    comboKey.LastCall = DateTime.MinValue;
+                                }
+                            }
+                            catch (OperationCanceledException)
+                            {
+                                this.Text = "Stoped Task";
+                                comboKey.LastCall = DateTime.MinValue;
+                            }
+                            //finally
+                            //{
+                            //    cancelCombo.Dispose();
+                            //}
                             break;
                         }
                     }
@@ -451,8 +486,6 @@ namespace WindowsFormsApp1
                 comboOrder += key;
                 lastUpdateOrder = DateTime.Now;
             }
-
-
             foreach (ComboKey comboKey in l_keymulti)
             {
                 if (comboOrder.Contains(comboKey.Multikeys))
@@ -461,9 +494,40 @@ namespace WindowsFormsApp1
                     {
                         if (IsCorrectCursor(comboKey))
                         {
+                            //comboKey.LastCall = DateTime.Now;
+                            //stopImmediate = false;
+                            //Combo(comboKey, DateTime.Now);
+                            //if (stopImmediate)
+                            //{
+                            //    comboKey.LastCall = DateTime.MinValue;
+                            //}
+                            //break;
+
                             comboKey.LastCall = DateTime.Now;
-                            Combo(comboKey);
-                            //comboOrder = "";
+                            cancelCombo = new CancellationTokenSource();
+                            cancelToken = cancelCombo.Token;
+                            Action actCombo = () =>
+                            {
+                                Combo(comboKey, DateTime.Now);
+                            };
+                            try
+                            {
+                                await Task.Run(actCombo, cancelToken);
+                                if (cancelToken.IsCancellationRequested)
+                                {
+                                    comboKey.LastCall = DateTime.MinValue;
+                                }
+                            }
+                            catch (OperationCanceledException)
+                            {
+                                this.Text = "Stoped Task";
+                                comboKey.LastCall = DateTime.MinValue;
+                            }
+                            //finally
+                            //{
+                            //    cancelCombo.Dispose();
+                            //    cancelCombo = new CancellationTokenSource();
+                            //}
                             break;
                         }
                     }
@@ -483,6 +547,23 @@ namespace WindowsFormsApp1
         }
         private void HookManager_KeyUp(object sender, KeyEventArgs e)
         {
+            if (!OnOff)
+            {
+                return;
+            }
+            if (Control.ModifierKeys != Keys.None)
+            {
+                // stopImmediate = true;
+                if (cancelCombo != null)
+                {
+                    cancelCombo.Cancel();
+                }
+
+            }
+            //else
+            //{
+            //    this.Text += e.Shift.ToString();
+            //}
         }
         private void castw()
         {
@@ -589,60 +670,54 @@ namespace WindowsFormsApp1
                     else
                     {
                         return TryGetEnemyPosition(200, 300);
-                        //Point current = GetCursorPoint();
-                        //int offset = 200;
-                        //Point offset_point = new Point(current.X - offset, current.Y - offset);
-                        //Bitmap manHinh = CaptureHelper.CaptureImage(new Size(2 * offset, 2 * offset), offset_point);
-                        //if (options.SaveImg)
-                        //{
-                        //    manHinh.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\cusor_offset.PNG");
-                        //}
-                        ////Bitmap manHinh = CaptureHelper.CaptureImage(new Size(1920 / 5, 1080 / 5), new Point(0, 0));
-                        //Bitmap thanhMau = ImageScanOpenCV.GetImage(System.IO.Directory.GetCurrentDirectory() + @"\Img\KhungThanhMau_Top.png");
-                        //Point? finded = FindOutPoint(manHinh, thanhMau);
-                        //if (finded.HasValue)
-                        //{
-
-                        //    int width_mh = 1920;
-                        //    int cast_x = 100 - 100 * current.X / width_mh;
-                        //    //this.Text += cast_x.ToString() + ";";
-                        //    Point enemyPosition = new Point(offset_point.X + finded.Value.X + cast_x, offset_point.Y + finded.Value.Y + 70);
-                        //    //Clipboard.SetText(Clipboard.GetText() + finded.Value.X.ToString() + "-" + finded.Value.Y.ToString() + "_" + enemyPosition.X.ToString() + "-" + enemyPosition.Y.ToString() + "; ");
-                        //    SetCursorPos(enemyPosition.X, enemyPosition.Y);
-                        //    return true;
-                        //}
-                        //else
-                        //{
-                        //    manHinh.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\cusor_offset_failed.PNG");
-                        //    return false;
-                        //}
                     }
+                case "tryFindEnemy":
+                    TryGetEnemyPosition(200, 300);
+                    return true;
                 default:
                     return true;
             }
         }
-        public bool TryGetEnemyPosition(int offset_X, int offset_Y)
+        public bool TryGetEnemyPosition(int offset_X, int offset_Y, bool moveCursor = true, double precast = 0)
         {
             Point current = GetCursorPoint();
-            //int offset = 200;
-            Point offset_point = new Point(current.X - offset_X, current.Y - offset_Y);
-            Bitmap manHinh = CaptureHelper.CaptureImage(new Size(2 * offset_X, 2 * offset_Y), offset_point);
+            int offsetFromHPdownToNhanVat = 80;
+            int offsetTopBonus = 100;
+            Point offset_point = new Point(current.X - offset_X, current.Y - offset_Y - offsetTopBonus);
+            Bitmap manHinh = CaptureHelper.CaptureImage(new Size(2 * offset_X, 2 * offset_Y + offsetTopBonus), offset_point);
+
+            //Full man hinh
+            if (offset_X < 0 && offset_Y < 0)
+            {
+                manHinh = CaptureHelper.CaptureImage(new Size(1920, 1080), new Point(0, 0));
+            }
+
             if (options.SaveImg)
             {
                 manHinh.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\cusor_offset.PNG");
             }
             //Bitmap manHinh = CaptureHelper.CaptureImage(new Size(1920 / 5, 1080 / 5), new Point(0, 0));
-            Bitmap thanhMau = ImageScanOpenCV.GetImage(System.IO.Directory.GetCurrentDirectory() + @"\Img\KhungThanhMau_Top.png");
+            // Bitmap thanhMau = ImageScanOpenCV.GetImage(System.IO.Directory.GetCurrentDirectory() + @"\Img\KhungThanhMau_Top.png");
+            Bitmap thanhMau = ImageScanOpenCV.GetImage(System.IO.Directory.GetCurrentDirectory() + @"\Img\KhungThanhMau_Botv2.png");
             Point? finded = FindOutPoint(manHinh, thanhMau);
             if (finded.HasValue)
             {
+                if (moveCursor)
+                {
+                    int width_mh = 1920;
+                    int cast_x = 100 - 100 * current.X / width_mh;
+                    //this.Text += cast_x.ToString() + ";";
 
-                int width_mh = 1920;
-                int cast_x = 100 - 100 * current.X / width_mh;
-                //this.Text += cast_x.ToString() + ";";
-                Point enemyPosition = new Point(offset_point.X + finded.Value.X + cast_x, offset_point.Y + finded.Value.Y + 70);
-                //Clipboard.SetText(Clipboard.GetText() + finded.Value.X.ToString() + "-" + finded.Value.Y.ToString() + "_" + enemyPosition.X.ToString() + "-" + enemyPosition.Y.ToString() + "; ");
-                SetCursorPos(enemyPosition.X, enemyPosition.Y);
+                    Point enemyPosition = new Point(offset_point.X + finded.Value.X + cast_x, offset_point.Y + finded.Value.Y + offsetFromHPdownToNhanVat);
+                    if (precast > 0)
+                    {
+                        int precast_x = (int)(enemyPosition.X + precast * (enemyPosition.X - current.X));
+                        int precast_y = (int)(enemyPosition.Y + precast * (enemyPosition.Y - current.Y));
+                        enemyPosition = new Point(precast_x, precast_y);
+                    }
+                    //Clipboard.SetText(Clipboard.GetText() + finded.Value.X.ToString() + "-" + finded.Value.Y.ToString() + "_" + enemyPosition.X.ToString() + "-" + enemyPosition.Y.ToString() + "; ");
+                    SetCursorPos(enemyPosition.X, enemyPosition.Y);
+                }
                 return true;
             }
             else
@@ -652,8 +727,17 @@ namespace WindowsFormsApp1
             }
         }
         //public void Combo(List<KeyDirectX> tbCombo)
-        public void Combo(ComboKey combo)
+        public void Combo(ComboKey combo, DateTime overAllStart)
         {
+            if (cancelToken.IsCancellationRequested)
+            {
+                return;
+            }
+            //if (stopImmediate)
+            //{
+            //    return;
+            //}
+
             DateTime start_combo = DateTime.Now;
             Point current = GetCursorPoint();
             if (combo.Option.SpecialHero == "ChupAnh")
@@ -671,7 +755,7 @@ namespace WindowsFormsApp1
                     y -= 108;
                 }
                 this.Text = y.ToString();
-                AutoControl.MouseClick(x, y, EMouseKey.DOUBLE_RIGHT);//cick box ten tai khoan
+                AutoControl.MouseClick(x, y, EMouseKey.RIGHT);//cick box ten tai khoan
                 return;
             }
 
@@ -683,6 +767,7 @@ namespace WindowsFormsApp1
                 ClipCursorOffset(current, offset);
             }
             bool exitLoop = false;
+            #region Pre Combo
             if (combo.L_code_combo.Count > 0)
             {
                 switch (combo.Option.SpecialHero)
@@ -731,7 +816,7 @@ namespace WindowsFormsApp1
                                 //this.Text = "conlai"; 
                             }
                         }
-                        else if (combo.Option.ComboName == "code4")
+                        else if (combo.Option.ComboName == "code4") // Tuong Bang
                         {
                             Point origin_current = new Point(current.X, current.Y);
                             HuyKeyPress(KeyDirectX.S);
@@ -739,7 +824,11 @@ namespace WindowsFormsApp1
                             int y = (int)(0.5 * (current_rect.Top + current_rect.Bottom));
                             if (current.X == x && current.Y == y)
                             {
-                                TryGetEnemyPosition(600, 450);
+                                if (!TryGetEnemyPosition(520, 330))
+                                {
+                                    combo.Combo = combo.L_code_combo[0];
+                                    goto boquaclickchuot;
+                                }
                                 current = GetCursorPoint();
                             }
                             else
@@ -747,8 +836,11 @@ namespace WindowsFormsApp1
                                 TryGetEnemyPosition(200, 200);
                                 current = GetCursorPoint();
                             }
-                            AutoControl.MouseClick(current.X, current.Y, EMouseKey.DOUBLE_RIGHT);//cick box ten tai khoan
+                            AutoControl.MouseClick(current.X, current.Y, EMouseKey.RIGHT);//cick box ten tai khoan
                             HuyKeyPress(KeyDirectX.S);
+
+                            //Time consumed 250ms
+
                             //Thoi gian cho quay ve huong enemy
                             //Thread.Sleep(300);
 
@@ -800,18 +892,33 @@ namespace WindowsFormsApp1
                                 combo.Combo = combo.L_code_combo[0];
                                 goto boquaclickchuot;
                             }
+                            //Time consumed 300ms
                             if (keySecond != KeyDirectX.Nothing)
                             {
-                                if (secondIsThaiDuong)
+                                if (secondIsThaiDuong) // khong tu dong tim doi thu de tha thai duong ma tha ngay vi tri chuot
                                 {
                                     SetCursorPos(origin_current.X, origin_current.Y);
                                 }
+                                else
+                                {
+                                    TryGetEnemyPosition(200, 200, true, 1);
+                                }
+                                Thread.Sleep(inner_interval);
                                 HuyKeyPress(keySecond);
-                                Thread.Sleep(200);
-                                TryGetEnemyPosition(200, 200);
-                                current = GetCursorPoint();
+                                Thread.Sleep(inner_interval);
+                                HuyKeyPress(KeyDirectX.D3);
+                                Thread.Sleep(200); //wait for second cast OK
+                                if (!secondIsThaiDuong)
+                                {
+                                    TryGetEnemyPosition(200, 200, true, 2);
+                                }
                             }
 
+                            current = GetCursorPoint();
+                            //Time consumed 450ms
+
+                            //Time consumed Checking....
+                            //goto endCombo;
 
                             int goc_chon_i = 0;
                             double min_khoangcach = 99;
@@ -856,46 +963,45 @@ namespace WindowsFormsApp1
                             //    goc = 360 - goc;
                             //}
                             //this.Text = goc.ToString() + ": " + x.ToString() + "," + y.ToString() + "---" + current.X.ToString() + "," + current.Y.ToString() + "---" + cast_x.ToString() + "," + cast_y.ToString();
+
+
+
                             SetCursorPos(cast_x, cast_y);
                             Thread.Sleep(10);
-                            AutoControl.MouseClick(cast_x, cast_y, EMouseKey.DOUBLE_RIGHT);//cick box ten tai khoan
+                            //Time consumed Checking....
+                            //goto endCombo;
+
+                            AutoControl.MouseClick(cast_x, cast_y, EMouseKey.RIGHT);//cick box ten tai khoan
                             HuyKeyPress(KeyDirectX.S);
                             Thread.Sleep(20);
-                            AutoControl.MouseClick(cast_x, cast_y, EMouseKey.DOUBLE_RIGHT);//cick box ten tai khoan
+                            AutoControl.MouseClick(cast_x, cast_y, EMouseKey.RIGHT);//cick box ten tai khoan
                             HuyKeyPress(KeyDirectX.S);
                             Thread.Sleep(20);
-                            AutoControl.MouseClick(cast_x, cast_y, EMouseKey.DOUBLE_RIGHT);//cick box ten tai khoan
+                            AutoControl.MouseClick(cast_x, cast_y, EMouseKey.RIGHT);//cick box ten tai khoan
                             HuyKeyPress(KeyDirectX.S);
                             Thread.Sleep(20);
 
-                            //HuyKeyPress(KeyDirectX.S);
-                            //HuyKeyPress(KeyDirectX.S);
-                            //HuyKeyPress(KeyDirectX.S);
-                            //Thread.Sleep(200);
-                            //for (int i = 0; i < 5; i++)
-                            //{
-                            //    Thread.Sleep(1 + 20 * i);
-                            //    HuyKeyPress(KeyDirectX.S);
-                            //}
-                            //Thread.Sleep(250);
+                            //Time consumed Checking....
+                            //goto endCombo;
+
                             HuyKeyPress(keyActive);
                             SetCursorPos(current.X, current.Y);
-                            //Thread.Sleep(150);
-                            //HuyKeyPress(KeyDirectX.S);
                             if (keySecond != KeyDirectX.Nothing)
                             {
                                 Thread.Sleep(100);
                                 if (secondIsThaiDuong)
                                 {
-                                    //TryGetEnemyPosition(200, 200);
+                                    TryGetEnemyPosition(200, 200);
+                                    HuyKeyPress(KeyDirectX.D3);
+                                    Thread.Sleep(inner_interval);
                                     HuyKeyPress(KeyDirectX.Q);
-                                    Thread.Sleep(20);
+                                    Thread.Sleep(inner_interval);
                                     HuyKeyPress(KeyDirectX.Q);
-                                    Thread.Sleep(20);
+                                    Thread.Sleep(inner_interval);
                                 }
                             }
                             goto endCombo;
-                        boquaclickchuot:;
+                            boquaclickchuot:;
                         }
                         else if (combo.Option.ComboName == "code5")
                         {
@@ -927,7 +1033,7 @@ namespace WindowsFormsApp1
                                         if (IsCorrectCursor(comboKey))
                                         {
                                             comboKey.LastCall = DateTime.Now;
-                                            Combo(comboKey);
+                                            Combo(comboKey, overAllStart);
                                             break;
                                         }
                                     }
@@ -938,21 +1044,79 @@ namespace WindowsFormsApp1
                         }
                         break;
                     case "Tinker-code":
-                        if (combo.Option.ComboName == "code1")
+                        if (combo.Option.ComboName == "code1" && CompareBitmapsFast(ally, GetCursorBitmap()))
                         {
-                            combo.Combo = combo.L_code_combo[0];
+                            if (CompareBitmapsFast(ally, GetCursorBitmap()))
+                            {
+                                HuyKeyPress(KeyDirectX.N);
+                                goto endCombo;
+                            }
+                        }
+                        else if (combo.Option.ComboName == "code2")
+                        {
+                            Keys active = active = Keys.D0;
+                            if (TryGetEnemyPosition(225, 100))
+                            {
+                                active = Keys.D;
+                            }
+                            else
+                            {
+                                if (CompareBitmapsFast(enemy, GetCursorBitmap()))
+                                {
+                                    active = Keys.G;
+                                }
+                            }
+                            foreach (ComboKey comboKey in l_keys)
+                            {
+                                if (comboKey.Keys == active)
+                                {
+                                    if ((DateTime.Now - comboKey.LastCall).TotalMilliseconds > delayBetweenCombos)
+                                    {
+                                        if (IsCorrectCursor(comboKey))
+                                        {
+                                            comboKey.LastCall = DateTime.Now;
+                                            Combo(comboKey, overAllStart);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            goto endCombo;
+                        }
+                        else
+                        {
+                            bool CapsLock = (((ushort)GetKeyState(0x14)) & 0xffff) != 0;
+                            //this.Text = CapsLock.ToString();
+                            if (CapsLock && combo.L_code_combo.Count > 1)
+                            {
+                                combo.Combo = combo.L_code_combo[1];
+                            }
+                            else
+                            {
+                                combo.Combo = combo.L_code_combo[0];
+                            }
                         }
                         break;
                     default:
                         break;
                 }
             }
+            #endregion
+            #region On combo
             if (combo.Option.CallWithMouse == "findEmeny")
             {
                 ClipCursor(ref current_rect);
             }
             foreach (KeyDirectX item in combo.Combo)
             {
+                if (cancelToken.IsCancellationRequested)
+                {
+                    return;
+                }
+                //if (stopImmediate)
+                //{
+                //    return;
+                //}
                 Thread.Sleep(inner_interval);
                 if (item == KeyDirectX.NumPadStar)
                 {
@@ -973,31 +1137,57 @@ namespace WindowsFormsApp1
                                 {
                                     bmp1.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\Q_test1.PNG");
                                 }
-                            //Bam Q
-                            chaylai:
-                                if (!IsCorrectCursor(combo))
+                                //Bam Q
+                                int lanthu = 0;
+                                chaylai:
+                                lanthu++;
+                                //this.Text = lanthu.ToString();
+                                //if (!IsCorrectCursor(combo))
+                                //{
+                                //    ClipCursor(ref current_rect);
+                                //    exitLoop = true;
+                                //    break;
+                                //}
+
+                                //int lanthu = 0;
+                                //    chaylai:
+                                //     lanthu++;
+                                //   if (lanthu > 4)
+                                //if (stopImmediate)
+                                //{
+                                //    exitLoop = true;
+                                //    break;
+                                //}
+                                //cancelToken.ThrowIfCancellationRequested();
+                                //if (stopImmediate)
+                                //{
+                                //    return;
+                                //}
+                                if (cancelToken.IsCancellationRequested)
                                 {
-                                    ClipCursor(ref current_rect);
+                                    return;
+                                }
+                                if ((DateTime.Now - start_combo).TotalMilliseconds > 500)
+                                {
+                                    if ((DateTime.Now - overAllStart).TotalMilliseconds > 2000)
+                                    {
+                                        HuyKeyPress(KeyDirectX.S);
+                                    }
+                                    //if (!options.ContinueAfterFailed)
+                                    else
+                                    {
+                                        // HuyKeyPress(KeyDirectX.S);
+                                        Combo(combo, overAllStart);
+                                    }
                                     exitLoop = true;
                                     break;
                                 }
+                                IsCorrectCursor(combo);
                                 HuyKeyPress(item);
                                 //Check anh nut Q
                                 Thread.Sleep(inner_interval);
                                 ClipCursor(ref current_rect);
-                                //int lanthu = 0;
-                                //    chaylai:
-                                //lanthu++;
-                                //   if (lanthu > 4)
-                                if ((DateTime.Now - start_combo).Seconds > 5)
-                                {
-                                    if (!options.ContinueAfterFailed)
-                                    {
-                                        HuyKeyPress(KeyDirectX.S);
-                                        exitLoop = true;
-                                    }
-                                    break;
-                                }
+
                                 Thread.Sleep(100);
                                 Bitmap bmp2 = CaptureHelper.CaptureImage(options.SizeQ, options.PointQ);
                                 if (options.SaveImg)
@@ -1018,10 +1208,10 @@ namespace WindowsFormsApp1
                                 double khoangcach = Math.Sqrt(Math.Pow(GetCursorPoint().X - current.X, 2) + Math.Pow(GetCursorPoint().Y - current.Y, 2));
                                 if (khoangcach > options.BlinkMin)
                                 {
-                                    if (options.BlinkDelay > 0)
-                                    {
-                                        Thread.Sleep(options.BlinkDelay);
-                                    }
+                                    //if (options.BlinkDelay > 0)
+                                    //{
+                                    //    Thread.Sleep(options.BlinkDelay);
+                                    //}
                                     HuyKeyPress(item);
                                 }
                             }
@@ -1063,7 +1253,7 @@ namespace WindowsFormsApp1
                             if (item == KeyDirectX.NumPadMinus || item == KeyDirectX.NumPadPlus)
                             {
                                 int lanthu = 0;
-                            chaylai:
+                                chaylai:
                                 lanthu++;
                                 //this.Text = this.Text + lanthu;
                                 //Chup anh nut R
@@ -1110,18 +1300,48 @@ namespace WindowsFormsApp1
                 }
                 if (exitLoop) break;
             }
-        endCombo:
+            #endregion
+            #region after Combo
+            if (combo.Option.ComboName != "")
+            {
+                switch (combo.Option.SpecialHero)
+                {
+                    case "Tinker-code":
+                        if (combo.Option.ComboName == "code4")
+                        {
+                            foreach (ComboKey comboKey in l_keys)
+                            {
+                                if (comboKey.Keys == Keys.F)
+                                {
+                                    if ((DateTime.Now - comboKey.LastCall).TotalMilliseconds > delayBetweenCombos)
+                                    {
+                                        if (IsCorrectCursor(comboKey))
+                                        {
+                                            comboKey.LastCall = DateTime.Now;
+                                            Combo(comboKey, overAllStart);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+            #endregion
+            endCombo:
             ClipCursor(ref current_rect);
+            //this.Text = (DateTime.Now - overAllStart).TotalMilliseconds.ToString();
             //CleaningDecimal();
 
         }
-
         private void ClipCursorOffset(Point current, int offset)
         {
             RECT rect = new RECT(current.X - offset, current.Y - offset, current.X + offset, current.Y + offset);
             ClipCursor(ref rect);
         }
-
         private Point TinhToanViTri(RECT current_rect, Point rightNow, int tamdanh)
         {
             int rawlength = 650;
@@ -1175,7 +1395,6 @@ namespace WindowsFormsApp1
             OnOff = true;
             this.Text = "Dota";
         }
-
         public void Combo(string tbCombo)
         {
             foreach (char item in tbCombo.ToLower())
@@ -1688,10 +1907,10 @@ public struct POINT
 public struct CURSORINFO
 {
     public Int32 cbSize;        // Specifies the size, in bytes, of the structure. 
-    // The caller must set this to Marshal.SizeOf(typeof(CURSORINFO)).
+                                // The caller must set this to Marshal.SizeOf(typeof(CURSORINFO)).
     public Int32 flags;         // Specifies the cursor state. This parameter can be one of the following values:
-    //    0             The cursor is hidden.
-    //    CURSOR_SHOWING    The cursor is showing.
+                                //    0             The cursor is hidden.
+                                //    CURSOR_SHOWING    The cursor is showing.
     public IntPtr hCursor;          // Handle to the cursor. 
     public POINT ptScreenPos;       // A POINT structure that receives the screen coordinates of the cursor. 
 }

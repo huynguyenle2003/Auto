@@ -673,9 +673,9 @@ namespace LoginVLTK_2
 
         private void bt_Test_Click(object sender, EventArgs e)
         {
-            //Bitmap manHinh = CaptureHelper.CaptureImage(new Size(1920 / 5, 1080 / 5), new Point(0, 0));
-            Bitmap manHinh = ImageScanOpenCV.GetImage(System.IO.Directory.GetCurrentDirectory() + @"\Dota\Img\cusor_offset_failed.PNG");
-            Bitmap thanhMau = ImageScanOpenCV.GetImage(System.IO.Directory.GetCurrentDirectory() + @"\Dota\Img\KhungThanhMau_Top.png");
+            Bitmap manHinh = CaptureHelper.CaptureImage(new Size(1920, 1080), new Point(0, 0));
+            //Bitmap manHinh = ImageScanOpenCV.GetImage(System.IO.Directory.GetCurrentDirectory() + @"\Dota\Img\cusor_offset_failed.PNG");
+            Bitmap thanhMau = ImageScanOpenCV.GetImage(System.IO.Directory.GetCurrentDirectory() + @"\Dota\Img\KhungThanhMau_Botv2.png");
             //double percent = 0;
             Point? find = FindOutPoint(manHinh, thanhMau);
             // MessageBox.Show(find.ToString());

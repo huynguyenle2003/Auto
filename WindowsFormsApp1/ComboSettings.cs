@@ -271,8 +271,8 @@ namespace WindowsFormsApp1
                 default:
                     break;
             }
-            return Keys.Space;
-
+            return Keys.None;
+            
         }
     }
     public class ComboKey

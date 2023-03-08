@@ -584,7 +584,7 @@ namespace WindowsFormsApp1
             // 
             this.nudTimeSpanOut.Location = new System.Drawing.Point(72, 14);
             this.nudTimeSpanOut.Maximum = new decimal(new int[] {
-            1000,
+            1500,
             0,
             0,
             0});
