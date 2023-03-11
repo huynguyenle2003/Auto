@@ -70,6 +70,21 @@ namespace WindowsFormsApp1
         public static extern int ShowCursor(bool show);
         [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true, CallingConvention = CallingConvention.Winapi)]
         public static extern short GetKeyState(int keyCode);
+        enum SystemMetric
+        {
+            SM_CXSCREEN = 0,
+            SM_CYSCREEN = 1,
+        }
+        [DllImport("user32.dll")]
+        static extern int GetSystemMetrics(SystemMetric smIndex);
+        static int CalculateAbsoluteCoordinateX(int x)
+        {
+            return (x * 65536) / GetSystemMetrics(SystemMetric.SM_CXSCREEN);
+        }
+        static int CalculateAbsoluteCoordinateY(int y)
+        {
+            return (y * 65536) / GetSystemMetrics(SystemMetric.SM_CYSCREEN);
+        }
         private void Dota_Load(object sender, EventArgs e)
         {
             #region Load Image Constrain
@@ -558,11 +573,11 @@ namespace WindowsFormsApp1
                 {
                     cancelCombo.Cancel();
                 }
-
             }
-            //else
+            //else if (e.KeyCode == Keys.S)
             //{
-            //    this.Text += e.Shift.ToString();
+            //    HuyMouseClick(new Point(960, 230), EMouseKey.RIGHT);
+            //    //HuyMouseDrag(new Point(960, 540), new Point(1060, 540));
             //}
         }
         private void castw()
@@ -821,17 +836,19 @@ namespace WindowsFormsApp1
                         }
                         else if (combo.Option.ComboName == "code4") // Tuong Bang
                         {
+                            bool castXX = false;
                             Point origin_current = new Point(current.X, current.Y);
-                            HuyKeyPress(KeyDirectX.S);
+                            HuyKeyPress(KeyDirectX.A);
                             int x = (int)(0.5 * (current_rect.Left + current_rect.Right));
                             int y = (int)(0.5 * (current_rect.Top + current_rect.Bottom));
                             if (current.X == x && current.Y == y)
                             {
-                                if (!TryGetEnemyPosition(520, 330))
+                                if (!TryGetEnemyPosition(600, 400))//520-330
                                 {
                                     combo.Combo = combo.L_code_combo[0];
                                     goto boquaclickchuot;
                                 }
+                                castXX = true;
                                 current = GetCursorPoint();
                             }
                             else
@@ -840,7 +857,7 @@ namespace WindowsFormsApp1
                                 current = GetCursorPoint();
                             }
                             AutoControl.MouseClick(current.X, current.Y, EMouseKey.RIGHT);//cick box ten tai khoan
-                            HuyKeyPress(KeyDirectX.S);
+                            //HuyKeyPress(KeyDirectX.S);
 
                             //Time consumed 250ms
 
@@ -898,22 +915,22 @@ namespace WindowsFormsApp1
                             //Time consumed 300ms
                             if (keySecond != KeyDirectX.Nothing)
                             {
-                                if (secondIsThaiDuong) // khong tu dong tim doi thu de tha thai duong ma tha ngay vi tri chuot
+                                if (!castXX) // khong tu dong tim doi thu de tha thai duong ma tha ngay vi tri chuot
                                 {
                                     SetCursorPos(origin_current.X, origin_current.Y);
                                 }
                                 else
                                 {
-                                    TryGetEnemyPosition(200, 200, true, 0.6);
-                                    Thread.Sleep(20);
-
+                                    TryGetEnemyPosition(200, 200, true, 1);//0.6
+                                    Thread.Sleep(20); //wait for get enemy finish.
                                 }
-                                Thread.Sleep(inner_interval);
                                 HuyKeyPress(keySecond);
                                 Thread.Sleep(inner_interval);
                                 HuyKeyPress(KeyDirectX.D3);
+                                Thread.Sleep(inner_interval);
+                                //HuyKeyPress(KeyDirectX.A);
                                 Thread.Sleep(200); //wait for second cast OK
-                                if (!secondIsThaiDuong)
+                                if (castXX)// neu ko la zc (la xx) thi du doan vi tri enymy roi cast tuong bang
                                 {
                                     TryGetEnemyPosition(200, 200, true, 4);
                                 }
@@ -955,6 +972,7 @@ namespace WindowsFormsApp1
                             //MessageBox.Show(l_gocChon);
                             if (min_khoangcach == 99)
                             {
+                                HuyKeyPress(KeyDirectX.A);
                                 goto endCombo;
                             }
                             //this.Text = current.X.ToString() + "-" + current.Y.ToString() + "_" + goc_chon_i.ToString() + "_" + min_khoangcach.ToString() + "_" + sLThoaKhoangCach.ToString();
@@ -996,17 +1014,37 @@ namespace WindowsFormsApp1
                                 Thread.Sleep(100);
                                 if (secondIsThaiDuong)
                                 {
-                                    TryGetEnemyPosition(200, 200);
+                                    // Co kha nang miss Q
+                                    HuyKeyPress(KeyDirectX.Q);
+                                    Thread.Sleep(inner_interval);
+                                    HuyKeyPress(KeyDirectX.Q);
+                                    Thread.Sleep(inner_interval);
                                     HuyKeyPress(KeyDirectX.D3);
                                     Thread.Sleep(inner_interval);
+
+                                    //try call minitun again
                                     HuyKeyPress(KeyDirectX.Q);
                                     Thread.Sleep(inner_interval);
-                                    HuyKeyPress(KeyDirectX.Q);
+                                    HuyKeyPress(KeyDirectX.R);
                                     Thread.Sleep(inner_interval);
+
+                                    TryGetEnemyPosition(200, 200);
+                                    Thread.Sleep(inner_interval);
+                                    HuyKeyPress(KeyDirectX.F);
+                                    Thread.Sleep(inner_interval);
+                                    HuyKeyPress(KeyDirectX.D3);
+
+                                }
+                                else
+                                {
+                                    HuyKeyPress(KeyDirectX.X);
+                                    Thread.Sleep(100);
+                                    HuyKeyPress(KeyDirectX.R);
                                 }
                             }
+                            HuyKeyPress(KeyDirectX.A);
                             goto endCombo;
-                        boquaclickchuot:;
+                            boquaclickchuot:;
                         }
                         else if (combo.Option.ComboName == "code5")
                         {
@@ -1088,6 +1126,12 @@ namespace WindowsFormsApp1
                             }
                             goto endCombo;
                         }
+                        else if (combo.Option.ComboName == "code3")
+                        {
+                            HuyMouseDrag(new Point(1295, 1055), new Point(1295, 965));
+                            SetCursorPos(current.X, current.Y);
+                            return;
+                        }
                         else
                         {
                             bool CapsLock = (((ushort)GetKeyState(0x14)) & 0xffff) != 0;
@@ -1144,7 +1188,7 @@ namespace WindowsFormsApp1
                                 }
                                 //Bam Q
                                 int lanthu = 0;
-                            chaylai:
+                                chaylai:
                                 lanthu++;
                                 //this.Text = lanthu.ToString();
                                 //if (!IsCorrectCursor(combo))
@@ -1258,7 +1302,7 @@ namespace WindowsFormsApp1
                             if (item == KeyDirectX.NumPadMinus || item == KeyDirectX.NumPadPlus)
                             {
                                 int lanthu = 0;
-                            chaylai:
+                                chaylai:
                                 lanthu++;
                                 //this.Text = this.Text + lanthu;
                                 //Chup anh nut R
@@ -1335,8 +1379,8 @@ namespace WindowsFormsApp1
                         break;
                 }
             }
-        #endregion
-        endCombo:
+            #endregion
+            endCombo:
             ClipCursor(ref current_rect);
             //this.Text = (DateTime.Now - overAllStart).TotalMilliseconds.ToString();
             //CleaningDecimal();
@@ -1486,67 +1530,112 @@ namespace WindowsFormsApp1
                 throw new Exception();
             }
         }
-        public static void HuyAltKeyPress(KeyDirectX keyCode)
+        public static void HuyMouseDown(Point point, EMouseKey eMouse = EMouseKey.LEFT)
         {
-            INPUT iNPUT0 = new INPUT
+            uint flag = 2u;
+            if (eMouse != EMouseKey.LEFT)
             {
-                Type = 1u
-            };
-            iNPUT0.Data.Keyboard = new KEYBDINPUT
+                flag = 8u;
+            }
+            INPUT iNPUT = new INPUT
             {
-                Vk = 0,
-                Scan = 56,
-                Flags = 8u,
-                Time = 0u,
-                ExtraInfo = IntPtr.Zero
+                Type = 0u
             };
-            INPUT iNPUT1 = new INPUT
-            {
-                Type = 1u
-            };
-            iNPUT1.Data.Keyboard = new KEYBDINPUT
-            {
-                Vk = 0,
-                Scan = (ushort)keyCode,
-                Flags = 8u,
-                Time = 0u,
-                ExtraInfo = IntPtr.Zero
-            };
-            INPUT iNPUT2 = new INPUT
-            {
-                Type = 1u
-            };
-            iNPUT2.Data.Keyboard = new KEYBDINPUT
-            {
-                Vk = 0,
-                Scan = (ushort)keyCode,
-                Flags = 8u | 2u,
-                Time = 0u,
-                ExtraInfo = IntPtr.Zero
-            };
-            INPUT iNPUT3 = new INPUT
-            {
-                Type = 1u
-            };
-            iNPUT2.Data.Keyboard = new KEYBDINPUT
-            {
-                Vk = 0,
-                Scan = 56,
-                Flags = 8u | 2u,
-                Time = 0u,
-                ExtraInfo = IntPtr.Zero
-            };
+            iNPUT.Data.Mouse = default(MOUSEINPUT);
+            iNPUT.Data.Mouse.X = CalculateAbsoluteCoordinateX(point.X);
+            iNPUT.Data.Mouse.Y = CalculateAbsoluteCoordinateY(point.Y);
+            iNPUT.Data.Mouse.MouseData = 0;
+            iNPUT.Data.Mouse.Flags = 32768u | 1u | flag;
+            iNPUT.Data.Mouse.Time = 0u;
+            iNPUT.Data.Mouse.ExtraInfo = IntPtr.Zero;
             INPUT[] inputs = new INPUT[]
             {
-                iNPUT0,
-                iNPUT1,
-                iNPUT2,
-                iNPUT3,
+                iNPUT
             };
-            if (SendInput(4u, inputs, Marshal.SizeOf(typeof(INPUT))) == 0u)
+            if (SendInput(1u, inputs, Marshal.SizeOf(typeof(INPUT))) == 0u)
             {
                 throw new Exception();
             }
+        }
+        public static void HuyMouseUp(Point point, EMouseKey eMouse = EMouseKey.LEFT)
+        {
+            uint flag = 4u;
+            if (eMouse != EMouseKey.LEFT)
+            {
+                flag = 16u;
+            }
+            INPUT iNPUT = new INPUT
+            {
+                Type = 0u
+            };
+            iNPUT.Data.Mouse = default(MOUSEINPUT);
+            iNPUT.Data.Mouse.X = CalculateAbsoluteCoordinateX(point.X);
+            iNPUT.Data.Mouse.Y = CalculateAbsoluteCoordinateY(point.Y);
+            iNPUT.Data.Mouse.MouseData = 0;
+            iNPUT.Data.Mouse.Flags = 32768u | 1u | flag;
+            iNPUT.Data.Mouse.Time = 0u;
+            iNPUT.Data.Mouse.ExtraInfo = IntPtr.Zero;
+            INPUT[] inputs = new INPUT[]
+            {
+                iNPUT
+            };
+            if (SendInput(1u, inputs, Marshal.SizeOf(typeof(INPUT))) == 0u)
+            {
+                throw new Exception();
+            }
+        }
+        public static void HuyMouseClick(Point point, EMouseKey eMouse = EMouseKey.LEFT)
+        {
+            uint flag = 2u;
+            if (eMouse != EMouseKey.LEFT)
+            {
+                flag = 8u;
+            }
+            INPUT iNPUT = new INPUT
+            {
+                Type = 0u
+            };
+            iNPUT.Data.Mouse = default(MOUSEINPUT);
+            iNPUT.Data.Mouse.X = CalculateAbsoluteCoordinateX(point.X);
+            iNPUT.Data.Mouse.Y = CalculateAbsoluteCoordinateY(point.Y);
+            iNPUT.Data.Mouse.MouseData = 0;
+            iNPUT.Data.Mouse.Flags = 32768u | 1u | flag;
+            iNPUT.Data.Mouse.Time = 0u;
+            iNPUT.Data.Mouse.ExtraInfo = IntPtr.Zero;
+
+            uint flag2 = 4u;
+            if (eMouse != EMouseKey.LEFT)
+            {
+                flag2 = 16u;
+            }
+            INPUT iNPUT2 = new INPUT
+            {
+                Type = 0u
+            };
+            iNPUT2.Data.Mouse = default(MOUSEINPUT);
+            iNPUT2.Data.Mouse.X = CalculateAbsoluteCoordinateX(point.X);
+            iNPUT2.Data.Mouse.Y = CalculateAbsoluteCoordinateY(point.Y);
+            iNPUT2.Data.Mouse.MouseData = 0;
+            iNPUT2.Data.Mouse.Flags = 32768u | 1u | flag2;
+            iNPUT2.Data.Mouse.Time = 0u;
+            iNPUT2.Data.Mouse.ExtraInfo = IntPtr.Zero;
+            INPUT[] inputs = new INPUT[]
+            {
+                iNPUT,
+                iNPUT2
+            };
+            if (SendInput(2u, inputs, Marshal.SizeOf(typeof(INPUT))) == 0u)
+            {
+                throw new Exception();
+            }
+        }
+        public static void HuyMouseDrag(Point start, Point end)
+        {
+            HuyMouseDown(start);
+            Thread.Sleep(50);
+            HuyMouseDown(end);
+            Thread.Sleep(50);
+            HuyMouseUp(end);
         }
         private void Dota_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -1890,6 +1979,8 @@ public struct HARDWAREINPUT
 }
 public struct MOUSEINPUT
 {
+    //https://learn.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-mouseinput
+
     public int X;
 
     public int Y;
