@@ -37,7 +37,6 @@ namespace WindowsFormsApp1
         public int DelayOut { get => delayOut; set => delayOut = value; }
         public int DelayIn { get => delayIn; set => delayIn = value; }
         public List<LineTuongBang> L_tuongbang { get => l_tuongbang; set => l_tuongbang = value; }
-
         public ComboSettings()
         {
             #region khai bao tuong bang
@@ -86,7 +85,6 @@ namespace WindowsFormsApp1
             L_tuongbang.Add(new LineTuongBang(35, new Point(55, 313), new Point(262, -398)));
             #endregion
         }
-
         public static KeyDirectX GetKeyDirectXSelect(char item)
         {
             switch (item)
@@ -175,6 +173,8 @@ namespace WindowsFormsApp1
                     return KeyDirectX.NumPadPlus;
                 case '/':
                     return KeyDirectX.Divide;
+                case '=':
+                    return KeyDirectX.Equals;
                 default:
                     break;
             }
@@ -268,6 +268,8 @@ namespace WindowsFormsApp1
                     return Keys.Add;
                 case '/':
                     return Keys.OemQuestion;
+                case '=':
+                    return Keys.Oemplus;
                 default:
                     break;
             }

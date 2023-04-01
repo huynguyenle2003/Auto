@@ -274,7 +274,6 @@ namespace WindowsFormsApp1
             }
             catch (Exception)
             {
-
             }
         }
         private void LoadSetting(ComboSettings user)
@@ -1033,18 +1032,38 @@ namespace WindowsFormsApp1
                                     HuyKeyPress(KeyDirectX.F);
                                     Thread.Sleep(inner_interval);
                                     HuyKeyPress(KeyDirectX.D3);
+                                    Thread.Sleep(100);
 
+                                    HuyKeyPress(KeyDirectX.Decimal);
+                                    Thread.Sleep(inner_interval);
+                                    HuyKeyPress(KeyDirectX.E);
+                                    Thread.Sleep(inner_interval);
+                                    HuyKeyPress(KeyDirectX.E);
+                                    Thread.Sleep(inner_interval);
+                                    HuyKeyPress(KeyDirectX.E);
+                                    Thread.Sleep(inner_interval);
+                                    HuyKeyPress(KeyDirectX.Divide);
                                 }
                                 else
                                 {
-                                    HuyKeyPress(KeyDirectX.X);
+                                    HuyKeyPress(KeyDirectX.Decimal);
+                                    Thread.Sleep(inner_interval);
+                                    HuyKeyPress(KeyDirectX.E);
+                                    Thread.Sleep(inner_interval);
+                                    HuyKeyPress(KeyDirectX.E);
+                                    Thread.Sleep(inner_interval);
+                                    HuyKeyPress(KeyDirectX.E);
+                                    Thread.Sleep(inner_interval);
+                                    HuyKeyPress(KeyDirectX.Divide);
                                     Thread.Sleep(100);
                                     HuyKeyPress(KeyDirectX.R);
                                 }
                             }
+
+                            Thread.Sleep(inner_interval);
                             HuyKeyPress(KeyDirectX.A);
                             goto endCombo;
-                            boquaclickchuot:;
+                        boquaclickchuot:;
                         }
                         else if (combo.Option.ComboName == "code5")
                         {
@@ -1171,6 +1190,11 @@ namespace WindowsFormsApp1
                 {
                     Thread.Sleep(interval);
                 }
+                //else if (item == KeyDirectX.Equals)
+                //{
+                //    SetCursorPos(current.X, current.Y);
+                //    Thread.Sleep(50);
+                //}
                 else
                 {
                     switch (combo.Option.SpecialHero)
@@ -1188,7 +1212,7 @@ namespace WindowsFormsApp1
                                 }
                                 //Bam Q
                                 int lanthu = 0;
-                                chaylai:
+                            chaylai:
                                 lanthu++;
                                 //this.Text = lanthu.ToString();
                                 //if (!IsCorrectCursor(combo))
@@ -1302,7 +1326,7 @@ namespace WindowsFormsApp1
                             if (item == KeyDirectX.NumPadMinus || item == KeyDirectX.NumPadPlus)
                             {
                                 int lanthu = 0;
-                                chaylai:
+                            chaylai:
                                 lanthu++;
                                 //this.Text = this.Text + lanthu;
                                 //Chup anh nut R
@@ -1379,8 +1403,8 @@ namespace WindowsFormsApp1
                         break;
                 }
             }
-            #endregion
-            endCombo:
+        #endregion
+        endCombo:
             ClipCursor(ref current_rect);
             //this.Text = (DateTime.Now - overAllStart).TotalMilliseconds.ToString();
             //CleaningDecimal();
@@ -1662,6 +1686,7 @@ namespace WindowsFormsApp1
             else
             {
                 SaveSetting(user);
+                user.L_tuongbang = null;
                 string json_text = JsonConvert.SerializeObject(user);
                 string name = cbSaved.Text.Trim();
                 // string save = name + "---" + json_text;
