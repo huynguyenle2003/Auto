@@ -1,4 +1,7 @@
-﻿using Gma.UserActivityMonitor;
+﻿using Emgu.CV;
+using Emgu.CV.CvEnum;
+using Emgu.CV.Structure;
+using Gma.UserActivityMonitor;
 using KAutoHelper;
 using System;
 using System.Collections.Generic;
@@ -37,7 +40,6 @@ namespace WindowsFormsApp1
         bool dht = false;
         Point targetX2;
         Point targetDHT;
-        RECT current_rect;
         private void ClipCursorOffset(Point current, int offset)
         {
             RECT rect = new RECT(current.X - offset, current.Y - offset, current.X + offset, current.Y + offset);
@@ -47,12 +49,9 @@ namespace WindowsFormsApp1
         {
             HookManager.KeyDown += HookManager_KeyDown;
             HookManager.MouseDown += HookManager_MouseDown;
-
-
-            GetClipCursor(out current_rect);
             toadoX2 = new List<Point>();
 
-            toadoX2.Add(new Point(145, 62));    //1
+            toadoX2.Add(new Point(145, 62));    //1 
             //toadoX2.Add(new Point(48, 122));  //2
             toadoX2.Add(new Point(48, 215));    //3
             //toadoX2.Add(new Point(52, 372));  //4
@@ -70,68 +69,17 @@ namespace WindowsFormsApp1
         private void HookManager_MouseDown(object sender, MouseEventArgs e)
         {
             HookManager.MouseDown -= HookManager_MouseDown;
-            //if (e.Button == MouseButtons.Right)
-            //{
-            //    continuedSpame = false;
-            //    Point current = GetCursorPoint();
-            //    int apSat = 50;
-            //    Point toado = ModifyPoint(current, apSat);
-            //    SetCursorPos(toado.X, toado.Y);
-            //    Thread.Sleep(200);
-            //    HuyKeyPress(KeyDirectX.F2);
-            //    //Point toadox2 = FindToaDoX2(toado);
-            //    //SetCursorPos(toadox2.X, toadox2.Y);
-
-            //    continuedSpame = true;
-            //    new Thread(() =>
-            //    {
-            //        spam9x();
-            //    }).Start();
-            //}
-            //else
-            {
-                continuedSpame = false;
-            }
+            continuedSpame = false;
             HookManager.MouseDown += HookManager_MouseDown;
         }
         private void HookManager_KeyDown(object sender, KeyEventArgs e)
         {
             if (chbSmoothLHT.Checked && (e.KeyCode == Keys.D3 || e.KeyCode == Keys.D2))
             {
-                //int timeLength = int.Parse(tbSpamLHT.Text);
-                //Point current = GetCursorPoint();
-
-                //HookManager.KeyDown -= HookManager_KeyDown;
-                //HuyKeyPress(KeyDirectX.D3);
-                //DateTime now = DateTime.Now;
-                //Thread.Sleep(100);
-                //if (chbGocX2.Checked)
-                //{
-                //    if (e.KeyCode == Keys.D2)
-                //    {
-                //        // Point toado = new Point(2 * myTVB.X - current.X, 2 * myTVB.Y - current.Y);
-                //        Point toado = FindToaDoX2(current, true);
-                //        SetCursorPos(toado.X, toado.Y);
-                //    }
-                //    else
-                //    {
-                //        Point toado = FindToaDoX2(current);
-                //        SetCursorPos(toado.X, toado.Y);
-                //    }
-                //}
-                //do
-                //{
-                //    Thread.Sleep(10);
-                //    HuyKeyPress(KeyDirectX.D4);
-                //}
-                //while ((DateTime.Now - now).TotalMilliseconds < timeLength);
-                //HookManager.KeyDown += HookManager_KeyDown;
-
                 HookManager.KeyDown -= HookManager_KeyDown;
                 Point current = GetCursorPoint();
                 if (e.KeyCode == Keys.D2)
                 {
-
                     int diff_y = current.Y - myTVB.Y;
                     int diff_x = current.X - myTVB.X;
                     Point targetTT;
@@ -150,14 +98,14 @@ namespace WindowsFormsApp1
                     {
                         if (diff_x > 0)
                         {
-                            targetTT = toadoX2[1];
+                            targetTT = toadoX2[2];
                         }
                         else
                         {
-                            targetTT = toadoX2[5];
+                            targetTT = toadoX2[6];
                         }
                     }
-                    targetTT = ModifyPoint(targetTT, 100);
+                    targetTT = ModifyPoint(targetTT, int.Parse(tbLengthx2.Text));
                     if (continuedSpame == true)
                     {
                         targetX2 = targetTT;
@@ -210,64 +158,93 @@ namespace WindowsFormsApp1
                 SetCursorPos(toado.X, toado.Y);
                 //this.Text += "__" + toado.X + "-" + toado.Y;
                 HookManager.KeyDown += HookManager_KeyDown;
-
             }
-            if (false && e.KeyCode == Keys.D) //ko xai
+            if (continuedSpame && chbDoiGoc.Checked && (e.KeyCode == Keys.Left || e.KeyCode == Keys.Right || e.KeyCode == Keys.Down || e.KeyCode == Keys.Up))
             {
-                //int timeLength = int.Parse(tbSpamLHTBack.Text);
-                //Point current = GetCursorPoint();
-
-                //HookManager.KeyDown -= HookManager_KeyDown;
-                //HuyKeyPress(KeyDirectX.D3);
-                //DateTime now = DateTime.Now;
-                //Thread.Sleep(200);
-                ////HuyKeyPress(KeyDirectX.M);
-                ////{
-                ////    Point toado = new Point(2 * myTVB.X - current.X, 2 * myTVB.Y - current.Y);
-                ////    SetCursorPos(toado.X, toado.Y);
-                ////}
-                //do
-                //{
-                //    Thread.Sleep(10);
-                //    HuyKeyPress(KeyDirectX.D4);
-                //}
-                //while ((DateTime.Now - now).TotalMilliseconds < timeLength);
-                //HookManager.KeyDown += HookManager_KeyDown;
+                Point enemy = TryFindEnemy(chbOnHouse.Checked, 300, 300);
+                int hor_x = 20;
+                int hor_y = 1;
+                int vert_x = 1;
+                int vert_y = 20;
+                if (chbOnHouse.Checked)
+                {
+                    hor_x = 25;
+                    hor_y = 0;
+                    //vert_x = 1;
+                    vert_y = 10;
+                }
+                if (enemy.X != 0 && enemy.Y != 0)
+                {
+                    HookManager.KeyDown -= HookManager_KeyDown;
+                    if (e.KeyCode == Keys.Left)
+                    {
+                        if (chbOnHouse.Checked)
+                        {
+                            targetX2 = ModifyPoint(toadoX2[5], int.Parse(tbLengthx2.Text));
+                        }
+                        else
+                        {
+                            targetX2 = ModifyPoint(toadoX2[6], int.Parse(tbLengthx2.Text));
+                        }
+                        targetDHT = new Point(enemy.X - hor_x, enemy.Y + hor_y);
+                        dht = true;
+                    }
+                    if (e.KeyCode == Keys.Right)
+                    {
+                        if (chbOnHouse.Checked)
+                        {
+                            targetX2 = ModifyPoint(toadoX2[1], int.Parse(tbLengthx2.Text));
+                        }
+                        else
+                        {
+                            targetX2 = ModifyPoint(toadoX2[2], int.Parse(tbLengthx2.Text));
+                        }
+                        targetDHT = new Point(enemy.X + hor_x, enemy.Y + hor_y);
+                        dht = true;
+                    }
+                    if (e.KeyCode == Keys.Down)
+                    {
+                        if (myTVB.X > enemy.X)
+                        {
+                            targetX2 = ModifyPoint(toadoX2[0], int.Parse(tbLengthx2.Text));
+                            targetDHT = new Point(enemy.X + vert_x, enemy.Y + vert_y);
+                            dht = true;
+                        }
+                        else
+                        {
+                            targetX2 = ModifyPoint(toadoX2[4], int.Parse(tbLengthx2.Text));
+                            targetDHT = new Point(enemy.X - vert_x, enemy.Y + vert_y);
+                            dht = true;
+                        }
+                    }
+                    if (e.KeyCode == Keys.Up)
+                    {
+                        if (myTVB.X > enemy.X)
+                        {
+                            targetX2 = ModifyPoint(toadoX2[2], int.Parse(tbLengthx2.Text));
+                            targetDHT = new Point(enemy.X + hor_x, enemy.Y + hor_y);
+                            dht = true;
+                        }
+                        else
+                        {
+                            targetX2 = ModifyPoint(toadoX2[6], int.Parse(tbLengthx2.Text));
+                            targetDHT = new Point(enemy.X - hor_x, enemy.Y + hor_y);
+                            dht = true;
+                        }
+                    }
+                    //test
+                    //SetCursorPos(targetDHT.X, targetDHT.Y);
+                    //Thread.Sleep(100);
+                    //HuyKeyPress(KeyDirectX.F2);
+                    //Thread.Sleep(200);
+                    //SetCursorPos(targetX2.X, targetX2.Y);
+                    //HuyKeyPress(KeyDirectX.F3);
+                    HookManager.KeyDown += HookManager_KeyDown;
+                }
             }
             if (chbLHT.Checked && e.KeyCode == Keys.Space)
             {
-                //int timeLength = int.Parse(tbSpamLHT.Text);
-                //Point current = GetCursorPoint();
-
-                //HookManager.KeyDown -= HookManager_KeyDown;
-                //Point toado = toadoX2[0];
-
-                //if (current.X < myTVB.X)
-                //{
-                //    toado = toadoX2[4];
-                //}
-                //toado = ModifyPoint(toado, int.Parse(tbLengthx2.Text));
-                //SetCursorPos(toado.X, toado.Y);
-                ////Point spamLHT = ModifyPoint(current, 1);
-                ////SetCursorPos(spamLHT.X, spamLHT.Y);
-                ////Thread.Sleep(50);
-                ////HuyKeyPress(KeyDirectX.D3);
-                ////SetCursorPos(current.X, current.Y);
-                //DateTime now = DateTime.Now;
-                ////Thread.Sleep(100);
-                //////{
-                ////Point toado = FindToaDoX2(current);
-                ////SetCursorPos(toado.X, toado.Y);
-                //////}
-                //do
-                //{
-                //    Thread.Sleep(10);
-                //    HuyKeyPress(KeyDirectX.D4);
-                //}
-                //while ((DateTime.Now - now).TotalMilliseconds < timeLength);
-                //HookManager.KeyDown += HookManager_KeyDown;
                 HookManager.KeyDown -= HookManager_KeyDown;
-
                 Point current = GetCursorPoint();
                 int apSat = 50;
                 targetDHT = ModifyPoint(current, apSat);
@@ -276,47 +253,10 @@ namespace WindowsFormsApp1
                     GetX2Point(false);
                     dht = true;
                 }).Start();
-
-                //GetX2Point(false);
-                //MessageBox.Show("outsite:" + targetX2.X.ToString() + "-" + targetX2.Y);
-                //dht = true;
-                //continuedSpame = true;
-                //new Thread(() =>
-                //{
-                //    spam9x();
-                //}).Start();
-
                 HookManager.KeyDown += HookManager_KeyDown;
             }
             if (chbTocBien.Checked && e.KeyCode == Keys.F)
             {
-                //int timeLength = int.Parse(tbSpamLHT.Text);
-
-                //HookManager.KeyDown -= HookManager_KeyDown;
-                //HuyKeyPress(KeyDirectX.V);
-                //Thread.Sleep(100);
-                //HuyKeyPress(KeyDirectX.R);
-                //Thread.Sleep(100);
-                //HuyKeyPress(KeyDirectX.D3);
-                //Thread.Sleep(100);
-                //HuyKeyPress(KeyDirectX.R);
-
-                //DateTime now = DateTime.Now;
-
-
-                ////{
-                ////    Point toado = new Point(2 * myTVB.X - current.X, 2 * myTVB.Y - current.Y);
-                ////    SetCursorPos(toado.X, toado.Y);
-                ////}
-
-                //do
-                //{
-                //    Thread.Sleep(10);
-                //    HuyKeyPress(KeyDirectX.D4);
-                //}
-                //while ((DateTime.Now - now).TotalMilliseconds < timeLength);
-                //HookManager.KeyDown += HookManager_KeyDown;
-
                 continuedSpame = false;
                 HookManager.KeyDown -= HookManager_KeyDown;
                 HuyKeyPress(KeyDirectX.V);
@@ -336,12 +276,49 @@ namespace WindowsFormsApp1
                 HuyKeyPress(KeyDirectX.V);
                 Thread.Sleep(200);
                 HuyKeyPress(KeyDirectX.V);
-                //Thread.Sleep(200);
-                //HuyKeyPress(KeyDirectX.V);
-                //Thread.Sleep(200);
-                //HuyKeyPress(KeyDirectX.V);
             }
+        }
 
+        private Point TryFindEnemy(bool trenNgua, int offset_X, int offset_Y)
+        {
+            Point current = GetCursorPoint();
+            int offsetHorse = 0;
+            if (trenNgua)
+            {
+                offsetHorse = 40;
+            }
+            int offsetTopBonus = 50;
+            Point offset_point = new Point(current.X - offset_X, current.Y - offset_Y - offsetTopBonus);
+            Bitmap manHinh = CaptureHelper.CaptureImage(new Size(2 * offset_X, 2 * offset_Y + offsetTopBonus), offset_point);
+            //manHinh.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\cusor_offset.PNG"); //save image
+            Point? finded = FindOutPoint(manHinh);
+            Point result = new Point(0, 0);
+            if (finded.HasValue)
+            {
+                result = new Point(offset_point.X + finded.Value.X + 20, offset_point.Y + finded.Value.Y + 75 + offsetHorse);
+            }
+            return result;
+        }
+        public static Point? FindOutPoint(Bitmap mainBitmap)
+        {
+            Image<Bgr, byte> arg_17_0 = new Image<Bgr, byte>(mainBitmap);
+            //Image<Bgr, byte> template = new Image<Bgr, byte>(subBitmap);
+            Point? result = null;
+            using (Image<Gray, byte> image = arg_17_0.InRange(new Bgr(0, 190, 229), new Bgr(0, 190, 231)))
+            {
+                //image.Save(@"D:\4. Lap Trinh\Project\Auto\WindowsFormsApp1\WindowsFormsApp1\bin\Debug\Dota\Img\Result.png");
+                double[] array;
+                double[] array2;
+                Point[] array3;
+                Point[] array4;
+
+                image.MinMax(out array, out array2, out array3, out array4);
+                if (array2[0] == 255)
+                {
+                    result = new Point?(array4[0]);
+                }
+            }
+            return result;
         }
         private void spam9x()
         {
@@ -365,10 +342,6 @@ namespace WindowsFormsApp1
                     HuyKeyPress(KeyDirectX.F2);
                     Thread.Sleep(50);
                     Bitmap bmp1 = CaptureHelper.CaptureImage(new Size(10, 10), new Point(110, 580));
-                    //if (true)//save image
-                    //{
-                    //    bmp1.Save(System.IO.Directory.GetCurrentDirectory() + @"\Img\DHT.PNG");
-                    //}
                     if (CompareBitmapsFast(bmp1, bmp2)) { goto chaylai; }
                     if (targetX2.X != 0 && targetX2.Y != 0)
                     {
@@ -382,7 +355,6 @@ namespace WindowsFormsApp1
             }
             while (continuedSpame);
         }
-
         private bool CompareBitmapsFast(Bitmap bmp1, Bitmap bmp2)
         {
             if (bmp1 == null || bmp2 == null)
@@ -418,7 +390,6 @@ namespace WindowsFormsApp1
 
             return result;
         }
-
         private Point FindToaDoX2(Point current, bool nguoc = false)
         {
             Point select = toadoX2[0];
@@ -447,22 +418,6 @@ namespace WindowsFormsApp1
             {
                 return ModifyPoint(select, int.Parse(tbLengthx2.Text));
             }
-            //if (!nguoc)
-            //{
-
-
-            //}
-            //else
-            //{
-            //    //if (tbBack.Text == "0")
-            //    //{
-            //    //    return select;
-            //    //}
-            //    //else
-            //    //{
-            //    //    return ModifyPoint(select, int.Parse(tbBack.Text));
-            //    //}
-            //}
         }
         private Point ModifyPoint(Point toado, int length)
         {
