@@ -38,6 +38,7 @@ namespace WindowsFormsApp1
         Point myTVB;
         bool continuedSpame = false;
         bool dht = false;
+        bool dht_tocbien_doigoc = false;
         Point targetX2;
         Point targetDHT;
         private void ClipCursorOffset(Point current, int offset)
@@ -49,6 +50,7 @@ namespace WindowsFormsApp1
         {
             HookManager.KeyDown += HookManager_KeyDown;
             HookManager.MouseDown += HookManager_MouseDown;
+            //HookManager.MouseDoubleClick += HookManager_MouseDoubleClick;
             toadoX2 = new List<Point>();
 
             toadoX2.Add(new Point(145, 62));    //1 
@@ -66,6 +68,7 @@ namespace WindowsFormsApp1
             toadoX2.Add(new Point(616, 556));   //12
             myTVB = new Point(402, 313);
         }
+
         private void HookManager_MouseDown(object sender, MouseEventArgs e)
         {
             HookManager.MouseDown -= HookManager_MouseDown;
@@ -159,8 +162,18 @@ namespace WindowsFormsApp1
                 //this.Text += "__" + toado.X + "-" + toado.Y;
                 HookManager.KeyDown += HookManager_KeyDown;
             }
-            if (continuedSpame && chbDoiGoc.Checked && (e.KeyCode == Keys.Left || e.KeyCode == Keys.Right || e.KeyCode == Keys.Down || e.KeyCode == Keys.Up))
+            if (chbDoiGoc.Checked && (e.KeyCode == Keys.Left || e.KeyCode == Keys.Right || e.KeyCode == Keys.Down || e.KeyCode == Keys.Up))
             {
+                if (!continuedSpame)
+                {
+                    targetX2 = new Point(0, 0);
+                    continuedSpame = true;
+                    dht_tocbien_doigoc = true;
+                    new Thread(() =>
+                    {
+                        spam9x();
+                    }).Start();
+                }
                 Point enemy = TryFindEnemy(chbOnHouse.Checked, 300, 300);
                 int hor_x = 20;
                 int hor_y = 1;
@@ -221,13 +234,27 @@ namespace WindowsFormsApp1
                     {
                         if (myTVB.X > enemy.X)
                         {
-                            targetX2 = ModifyPoint(toadoX2[2], int.Parse(tbLengthx2.Text));
+                            if (chbOnHouse.Checked)
+                            {
+                                targetX2 = ModifyPoint(toadoX2[1], int.Parse(tbLengthx2.Text));
+                            }
+                            else
+                            {
+                                targetX2 = ModifyPoint(toadoX2[2], int.Parse(tbLengthx2.Text));
+                            }
                             targetDHT = new Point(enemy.X + hor_x, enemy.Y + hor_y);
                             dht = true;
                         }
                         else
                         {
-                            targetX2 = ModifyPoint(toadoX2[6], int.Parse(tbLengthx2.Text));
+                            if (chbOnHouse.Checked)
+                            {
+                                targetX2 = ModifyPoint(toadoX2[5], int.Parse(tbLengthx2.Text));
+                            }
+                            else
+                            {
+                                targetX2 = ModifyPoint(toadoX2[6], int.Parse(tbLengthx2.Text));
+                            }
                             targetDHT = new Point(enemy.X - hor_x, enemy.Y + hor_y);
                             dht = true;
                         }
@@ -257,25 +284,33 @@ namespace WindowsFormsApp1
             }
             if (chbTocBien.Checked && e.KeyCode == Keys.F)
             {
+                targetX2 = new Point(0, 0);
                 continuedSpame = false;
                 HookManager.KeyDown -= HookManager_KeyDown;
-                HuyKeyPress(KeyDirectX.V);
                 HuyKeyPress(KeyDirectX.F2);
+                HuyKeyPress(KeyDirectX.V);
+
                 continuedSpame = true;
-                Thread.Sleep(200);
+                Thread.Sleep(100);
                 new Thread(() =>
                 {
-                    GetX2Point();
+                    GetX2Point(false);
                 }).Start();
                 new Thread(() =>
                 {
                     spam9x();
                 }).Start();
+                for (int i = 0; i < 4; i++)
+                {
+                    HuyKeyPress(KeyDirectX.V);
+                    Thread.Sleep(50);
+                    HuyKeyPress(KeyDirectX.V);
+                    Thread.Sleep(50);
+                    HuyKeyPress(KeyDirectX.F3);
+                    Thread.Sleep(50);
+                }
+                SetCursorPos(targetX2.X, targetX2.Y);
                 HookManager.KeyDown += HookManager_KeyDown;
-                Thread.Sleep(200);
-                HuyKeyPress(KeyDirectX.V);
-                Thread.Sleep(200);
-                HuyKeyPress(KeyDirectX.V);
             }
         }
 
@@ -339,6 +374,10 @@ namespace WindowsFormsApp1
                         SetCursorPos(current.X, current.Y);
                         goto boqua;
                     }
+                    if (chbVwhenchange.Checked || dht_tocbien_doigoc)
+                    {
+                        HuyKeyPress(KeyDirectX.V);
+                    }
                     HuyKeyPress(KeyDirectX.F2);
                     Thread.Sleep(50);
                     Bitmap bmp1 = CaptureHelper.CaptureImage(new Size(10, 10), new Point(110, 580));
@@ -347,8 +386,22 @@ namespace WindowsFormsApp1
                     {
                         SetCursorPos(targetX2.X, targetX2.Y);
                     }
+                    if (chbVwhenchange.Checked || dht_tocbien_doigoc)
+                    {
+                        for (int i = 0; i < 4; i++)
+                        {
+
+                            HuyKeyPress(KeyDirectX.V);
+                            Thread.Sleep(50);
+                            HuyKeyPress(KeyDirectX.V);
+                            Thread.Sleep(50);
+                            HuyKeyPress(KeyDirectX.F3);
+                            Thread.Sleep(50);
+                        }
+                    }
                     boqua:
                     dht = false;
+                    dht_tocbien_doigoc = false;
                 }
                 HuyKeyPress(KeyDirectX.F3);
                 Thread.Sleep(50);

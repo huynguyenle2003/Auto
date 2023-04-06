@@ -36,6 +36,7 @@ namespace WindowsFormsApp1
             this.chbDoiGoc = new System.Windows.Forms.CheckBox();
             this.tbLengthx2 = new System.Windows.Forms.TextBox();
             this.chbOnHouse = new System.Windows.Forms.CheckBox();
+            this.chbVwhenchange = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // chbSmoothLHT
@@ -116,11 +117,22 @@ namespace WindowsFormsApp1
             this.chbOnHouse.Text = "Tren Ngua";
             this.chbOnHouse.UseVisualStyleBackColor = true;
             // 
+            // chbVwhenchange
+            // 
+            this.chbVwhenchange.AutoSize = true;
+            this.chbVwhenchange.Location = new System.Drawing.Point(90, 81);
+            this.chbVwhenchange.Name = "chbVwhenchange";
+            this.chbVwhenchange.Size = new System.Drawing.Size(79, 17);
+            this.chbVwhenchange.TabIndex = 13;
+            this.chbVwhenchange.Text = "Khi doi goc";
+            this.chbVwhenchange.UseVisualStyleBackColor = true;
+            // 
             // frm_TV
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(192, 132);
+            this.Controls.Add(this.chbVwhenchange);
             this.Controls.Add(this.chbOnHouse);
             this.Controls.Add(this.tbLengthx2);
             this.Controls.Add(this.chbDoiGoc);
@@ -147,5 +159,6 @@ namespace WindowsFormsApp1
         private System.Windows.Forms.CheckBox chbDoiGoc;
         private System.Windows.Forms.TextBox tbLengthx2;
         private System.Windows.Forms.CheckBox chbOnHouse;
+        private System.Windows.Forms.CheckBox chbVwhenchange;
     }
 }
